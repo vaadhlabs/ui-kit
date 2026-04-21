@@ -1,6 +1,6 @@
 /**
- * MUI theme tokens shared across shell + MFs. Real port of the existing
- * apps/gpu-dashboard-frontend theme lands when the first real MF needs MUI.
+ * MUI theme tokens shared across shell + MFs.
+ * Fleshes out when the first real MF needs MUI components.
  */
 export const tokens = {
   light: {
