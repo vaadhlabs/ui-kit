@@ -1,17 +1,25 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { useTheme } from "@mui/material/styles";
 import { ThemeShellProvider, useThemeMode } from "../ThemeShellProvider.js";
 
 function ModeReader(): JSX.Element {
-  const { mode, setting, toggleTheme, setThemeMode } = useThemeMode();
+  const { mode, setting, toggleTheme, setThemeMode, setBrandColors } = useThemeMode();
+  const theme = useTheme();
   return (
     <div>
       <span data-testid="mode">{mode}</span>
       <span data-testid="setting">{setting}</span>
+      <span data-testid="primary">{theme.palette.primary.main}</span>
+      <span data-testid="secondary">{theme.palette.secondary.main}</span>
       <button onClick={toggleTheme}>toggle</button>
       <button onClick={() => setThemeMode("dark")}>set-dark</button>
       <button onClick={() => setThemeMode("system")}>set-system</button>
+      <button onClick={() => setBrandColors({ primary: "#aabbcc", secondary: "#ddeeff" })}>
+        runtime-brand
+      </button>
+      <button onClick={() => setBrandColors({})}>runtime-brand-reset</button>
     </div>
   );
 }
@@ -117,5 +125,37 @@ describe("ThemeShellProvider", () => {
       // trigger no-op effect
     });
     expect(screen.getByTestId("mode")).toBeInTheDocument();
+  });
+
+  it("setBrandColors at runtime re-themes the MUI palette (§2.15 / Audit P0-8)", async () => {
+    const user = userEvent.setup();
+    render(
+      <ThemeShellProvider primaryColor="#000000" secondaryColor="#111111">
+        <ModeReader />
+      </ThemeShellProvider>,
+    );
+    // Boot-time props in effect.
+    expect(screen.getByTestId("primary")).toHaveTextContent(/^#000000$/i);
+    expect(screen.getByTestId("secondary")).toHaveTextContent(/^#111111$/i);
+
+    await user.click(screen.getByText("runtime-brand"));
+    expect(screen.getByTestId("primary")).toHaveTextContent(/^#aabbcc$/i);
+    expect(screen.getByTestId("secondary")).toHaveTextContent(/^#ddeeff$/i);
+  });
+
+  it("setBrandColors with empty object falls back to boot-time defaults", async () => {
+    const user = userEvent.setup();
+    render(
+      <ThemeShellProvider primaryColor="#abcdef" secondaryColor="#fedcba">
+        <ModeReader />
+      </ThemeShellProvider>,
+    );
+    // Move it away from the defaults first, then ask to reset.
+    await user.click(screen.getByText("runtime-brand"));
+    expect(screen.getByTestId("primary")).toHaveTextContent(/^#aabbcc$/i);
+
+    await user.click(screen.getByText("runtime-brand-reset"));
+    expect(screen.getByTestId("primary")).toHaveTextContent(/^#abcdef$/i);
+    expect(screen.getByTestId("secondary")).toHaveTextContent(/^#fedcba$/i);
   });
 });

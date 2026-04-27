@@ -5,11 +5,25 @@ import { createTensorTheme, type ThemeMode } from "./theme.js";
 
 export type ThemeSetting = "system" | "light" | "dark";
 
+export interface BrandColors {
+  primary?: string;
+  secondary?: string;
+}
+
 interface ThemeModeCtx {
   mode: ThemeMode;
   setting: ThemeSetting;
   toggleTheme(): void;
   setThemeMode(next: ThemeSetting): void;
+  /**
+   * Apply per-tenant branding colours discovered AFTER the provider mounted.
+   * The shell calls this once `loadRuntimeConfig()` resolves with the
+   * tenant's `branding.primaryColor` / `branding.secondaryColor`. Pass
+   * undefined for either to fall back to the boot-time defaults (the
+   * `primaryColor` / `secondaryColor` props this provider was rendered
+   * with).
+   */
+  setBrandColors(next: BrandColors): void;
 }
 
 const ThemeModeContext = createContext<ThemeModeCtx | null>(null);
@@ -24,7 +38,7 @@ const STORAGE_KEY = "tc.theme-mode";
 
 export interface ThemeShellProviderProps {
   children: ReactNode;
-  /** Optional per-tenant branding overrides (from runtime-config). */
+  /** Boot-time branding defaults. Used until `setBrandColors` is called. */
   primaryColor?: string;
   secondaryColor?: string;
   /** Default setting when the user hasn't chosen one yet. */
@@ -45,6 +59,14 @@ export function ThemeShellProvider({
     return stored ?? defaultSetting;
   });
 
+  // Runtime brand colour overrides. Initialised from the props (boot-time
+  // defaults) and updated when the shell calls `setBrandColors` after
+  // runtime-config arrives. 26-FCR §2.15 / Audit P0-8.
+  const [brand, setBrand] = useState<BrandColors>(() => ({
+    primary: primaryColor,
+    secondary: secondaryColor,
+  }));
+
   useEffect(() => {
     if (typeof localStorage === "undefined") return;
     if (setting === "system") localStorage.removeItem(STORAGE_KEY);
@@ -57,15 +79,21 @@ export function ThemeShellProvider({
   const toggleTheme = useCallback((): void => {
     setSetting((prev) => (prev === "system" ? "light" : prev === "light" ? "dark" : "system"));
   }, []);
+  const setBrandColors = useCallback((next: BrandColors): void => {
+    setBrand({
+      primary: next.primary ?? primaryColor,
+      secondary: next.secondary ?? secondaryColor,
+    });
+  }, [primaryColor, secondaryColor]);
 
   const theme = useMemo(
-    () => createTensorTheme(mode, { primary: primaryColor, secondary: secondaryColor }),
-    [mode, primaryColor, secondaryColor],
+    () => createTensorTheme(mode, { primary: brand.primary, secondary: brand.secondary }),
+    [mode, brand.primary, brand.secondary],
   );
 
   const ctx = useMemo<ThemeModeCtx>(
-    () => ({ mode, setting, toggleTheme, setThemeMode }),
-    [mode, setting, toggleTheme, setThemeMode],
+    () => ({ mode, setting, toggleTheme, setThemeMode, setBrandColors }),
+    [mode, setting, toggleTheme, setThemeMode, setBrandColors],
   );
 
   return (
