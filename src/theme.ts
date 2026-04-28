@@ -1,4 +1,4 @@
-import { createTheme, type Theme } from "@mui/material/styles";
+import { createTheme, darken, getContrastRatio, lighten, type Theme } from "@mui/material/styles";
 
 /**
  * Tensor Cost design tokens, mirrored from apps/gpu-dashboard-frontend's
@@ -6,6 +6,19 @@ import { createTheme, type Theme } from "@mui/material/styles";
  * the shell can swap light/dark at runtime.
  */
 export type ThemeMode = "light" | "dark";
+
+// MUI's default `light`/`dark` tonal coefficients (see @mui/material/styles
+// augmentColor). We compute shades the same way it would so an arbitrary
+// brand colour (orange, green, magenta) gets a coherent palette instead of
+// only `palette.primary.main` flipping while hover/active states stay blue.
+const TONAL_OFFSET = 0.2;
+
+function deriveContrastText(hex: string): string {
+  // 3:1 is WCAG large-text minimum; 4.5:1 is the regular-text minimum. We
+  // pick black or white text per primary/secondary so light brand colours
+  // don't render white-on-pastel.
+  return getContrastRatio(hex, "#FFFFFF") >= 3 ? "#FFFFFF" : "#0F172A";
+}
 
 export function createTensorTheme(mode: ThemeMode, overrides?: { primary?: string; secondary?: string }): Theme {
   const isDark = mode === "dark";
@@ -16,8 +29,18 @@ export function createTensorTheme(mode: ThemeMode, overrides?: { primary?: strin
   return createTheme({
     palette: {
       mode,
-      primary: { main: primary, light: "#60A5FA", dark: "#2563EB", contrastText: "#FFFFFF" },
-      secondary: { main: secondary, light: "#22D3EE", dark: "#0891B2" },
+      primary: {
+        main: primary,
+        light: lighten(primary, TONAL_OFFSET),
+        dark: darken(primary, TONAL_OFFSET),
+        contrastText: deriveContrastText(primary),
+      },
+      secondary: {
+        main: secondary,
+        light: lighten(secondary, TONAL_OFFSET),
+        dark: darken(secondary, TONAL_OFFSET),
+        contrastText: deriveContrastText(secondary),
+      },
       success: { main: "#10B981", light: "#34D399", dark: "#059669" },
       warning: { main: "#F59E0B", light: "#FBBF24", dark: "#D97706" },
       error: { main: "#EF4444", light: "#F87171", dark: "#DC2626" },
