@@ -1,7 +1,5 @@
 import { type ReactNode } from "react";
 import {
-  Box,
-  CircularProgress,
   Paper,
   Skeleton,
   Table,
@@ -83,12 +81,9 @@ export function DataTable<Row>({
           ) : rows.length === 0 ? (
             <TableRow>
               <TableCell colSpan={columns.length} align="center" sx={{ py: 4 }}>
-                <Box display="flex" flexDirection="column" alignItems="center" gap={1}>
-                  <CircularProgress size={16} sx={{ opacity: 0.2 }} />
-                  <Typography variant="body2" color="text.secondary">
-                    {emptyMessage}
-                  </Typography>
-                </Box>
+                <Typography variant="body2" color="text.secondary">
+                  {emptyMessage}
+                </Typography>
               </TableCell>
             </TableRow>
           ) : (
