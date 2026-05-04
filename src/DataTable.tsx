@@ -17,24 +17,6 @@ export interface DataTableColumn<Row> {
   width?: number | string;
   align?: "left" | "right" | "center";
   render?: (row: Row) => ReactNode;
-  /**
-   * Hide this column on viewports narrower than the given MUI breakpoint.
-   * Implemented via `display: { xs: "none", <breakpoint>: "table-cell" }`
-   * on header + body cells, so the column collapses cleanly without
-   * leaving stray padding. Use for secondary metadata that's nice-to-
-   * have on desktop but not worth a horizontal scroll on phones.
-   */
-  hideBelow?: "sm" | "md" | "lg";
-}
-
-const HIDE_DISPLAY: Record<NonNullable<DataTableColumn<unknown>["hideBelow"]>, Record<string, string>> = {
-  sm: { xs: "none", sm: "table-cell" },
-  md: { xs: "none", md: "table-cell" },
-  lg: { xs: "none", lg: "table-cell" },
-};
-
-function cellDisplay<Row>(c: DataTableColumn<Row>): Record<string, string> | undefined {
-  return c.hideBelow ? HIDE_DISPLAY[c.hideBelow] : undefined;
 }
 
 export interface DataTableProps<Row> {
@@ -79,11 +61,7 @@ export function DataTable<Row>({
         <TableHead>
           <TableRow>
             {columns.map((c) => (
-              <TableCell
-                key={c.key}
-                align={c.align ?? "left"}
-                sx={{ width: c.width, display: cellDisplay(c) }}
-              >
+              <TableCell key={c.key} align={c.align ?? "left"} sx={{ width: c.width }}>
                 {c.header}
               </TableCell>
             ))}
@@ -94,7 +72,7 @@ export function DataTable<Row>({
             Array.from({ length: skeletonRows }).map((_, i) => (
               <TableRow key={`sk-${i}`}>
                 {columns.map((c) => (
-                  <TableCell key={c.key} align={c.align ?? "left"} sx={{ display: cellDisplay(c) }}>
+                  <TableCell key={c.key} align={c.align ?? "left"}>
                     <Skeleton width="80%" />
                   </TableCell>
                 ))}
@@ -117,7 +95,7 @@ export function DataTable<Row>({
                 sx={{ cursor: onRowClick ? "pointer" : "default" }}
               >
                 {columns.map((c) => (
-                  <TableCell key={c.key} align={c.align ?? "left"} sx={{ display: cellDisplay(c) }}>
+                  <TableCell key={c.key} align={c.align ?? "left"}>
                     {c.render ? c.render(row) : ((row as unknown as Record<string, ReactNode>)[c.key] ?? "—")}
                   </TableCell>
                 ))}
