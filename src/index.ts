@@ -7,3 +7,4 @@ export * from "./DataListPage.js";
 export * from "./RowDetailsDialog.js";
 export * from "./SavingsBanner.js";
 export * from "./useSavingsBanner.js";
+export * from "./RequireRole.js";
