@@ -11,6 +11,8 @@ import {
   TableHead,
   TableRow,
   Typography,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 
 export interface DataTableColumn<Row> {
@@ -108,11 +110,21 @@ export function DataTable<Row>({
   }
 
   // ── Mobile card view ──────────────────────────────────────────────────
-  // Below `mobileBreakpoint`, render rows as a stack of cards. The table
-  // view is hidden via `display`. Rendered conditionally so the cards
-  // don't pay layout cost on desktop and vice versa.
-  const cardOnlyAtXs = { xs: "block", [mobileBreakpoint]: "none" };
-  const tableOnlyAtBp = { xs: "none", [mobileBreakpoint]: "block" };
+  // Below `mobileBreakpoint`, render rows as a stack of cards. Above the
+  // breakpoint, render the regular table. We use `useMediaQuery` so only
+  // ONE tree mounts at a time:
+  //   - simpler DOM (no hidden duplicate rendering)
+  //   - tests using `getByText` don't double-match ("Found multiple
+  //     elements" failures observed across alert-mf / integration-mf /
+  //     reports-mf / others when both views rendered simultaneously in
+  //     JSDOM, which doesn't simulate viewport-CSS).
+  // Tradeoff: a viewport resize across the breakpoint triggers a remount
+  // of the rows tree (loses any in-DOM-only state like a half-typed
+  // search filter). Acceptable — DataTable is read-only by contract;
+  // page-owned state lives on the page, not on DataTable.
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down(mobileBreakpoint));
+  const useCardView = Boolean(mobileCard) && isMobile;
 
   const headSx = (idx: number): Record<string, unknown> | undefined =>
     stickyFirstColumn && idx === 0 ? STICKY_HEAD_SX : undefined;
@@ -121,8 +133,8 @@ export function DataTable<Row>({
 
   return (
     <>
-      {mobileCard && (
-        <Box sx={{ display: cardOnlyAtXs }}>
+      {useCardView && mobileCard && (
+        <Box>
           {loading ? (
             <Stack spacing={1.5}>
               {Array.from({ length: skeletonRows }).map((_, i) => (
@@ -162,8 +174,9 @@ export function DataTable<Row>({
         </Box>
       )}
 
-      <Box sx={mobileCard ? { display: tableOnlyAtBp } : undefined}>
-        <TableContainer component={Paper}>
+      {!useCardView && (
+        <Box>
+          <TableContainer component={Paper}>
           <Table size="small">
             <TableHead>
               <TableRow>
@@ -216,7 +229,8 @@ export function DataTable<Row>({
             </TableBody>
           </Table>
         </TableContainer>
-      </Box>
+        </Box>
+      )}
     </>
   );
 }
