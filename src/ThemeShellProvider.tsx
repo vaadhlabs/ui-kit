@@ -28,10 +28,22 @@ interface ThemeModeCtx {
 
 const ThemeModeContext = createContext<ThemeModeCtx | null>(null);
 
+const NOOP_THEME_CTX: ThemeModeCtx = {
+  mode: "light",
+  setting: "light",
+  toggleTheme: () => {},
+  setThemeMode: () => {},
+  setBrandColors: () => {},
+};
+
+/**
+ * Returns the active theme context. Outside a `<ThemeShellProvider>` it
+ * falls back to a fixed light-mode no-op context so MFs can render
+ * standalone (e.g. in vitest, in a Storybook frame) without forcing every
+ * test to mount the shell provider.
+ */
 export function useThemeMode(): ThemeModeCtx {
-  const v = useContext(ThemeModeContext);
-  if (!v) throw new Error("useThemeMode must be used within <ThemeShellProvider>");
-  return v;
+  return useContext(ThemeModeContext) ?? NOOP_THEME_CTX;
 }
 
 const STORAGE_KEY = "tc.theme-mode";

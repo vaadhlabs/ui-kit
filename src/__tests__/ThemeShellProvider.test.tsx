@@ -96,11 +96,12 @@ describe("ThemeShellProvider", () => {
     expect(localStorage.getItem("tc.theme-mode")).toBeNull();
   });
 
-  it("useThemeMode throws outside the provider", () => {
-    const orig = console.error;
-    console.error = () => {};
-    expect(() => render(<ModeReader />)).toThrow(/useThemeMode/);
-    console.error = orig;
+  it("useThemeMode falls back to a light, no-op context outside the provider", () => {
+    // MFs render standalone in vitest without the shell. The hook returns
+    // a fixed light-mode context with no-op setters so they don't crash.
+    const { getByTestId } = render(<ModeReader />);
+    expect(getByTestId("mode").textContent).toBe("light");
+    expect(getByTestId("setting").textContent).toBe("light");
   });
 
   it("respects custom primary/secondary overrides via the theme prop", () => {
