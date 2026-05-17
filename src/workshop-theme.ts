@@ -90,10 +90,26 @@ const SECTION_TOKENS_DARK: Record<Section, SectionTokens> = {
 
 const TONAL_OFFSET = 0.2;
 
-export function createWorkshopTheme(mode: WorkshopMode = "light"): Theme {
+/**
+ * Optional per-tenant brand overrides. The shell calls this with the
+ * tenant's branding colours so a white-labeled deployment can keep
+ * its primary/secondary while still picking up the Workshop layout,
+ * type scale, and section tokens. If overrides are omitted the theme
+ * defaults to Workshop's own observe-blue / optimize-teal pair.
+ */
+export interface WorkshopOverrides {
+  primary?: string;
+  secondary?: string;
+}
+
+export function createWorkshopTheme(
+  mode: WorkshopMode = "light",
+  overrides: WorkshopOverrides = {},
+): Theme {
   const isDark = mode === "dark";
-  const primary = "#2563EB"; // Observe (brand)
   const section = isDark ? SECTION_TOKENS_DARK : SECTION_TOKENS_LIGHT;
+  const primary = overrides.primary ?? "#2563EB"; // Observe (brand) by default
+  const secondary = overrides.secondary ?? section.optimize.accent;
 
   return createTheme({
     palette: {
@@ -105,7 +121,7 @@ export function createWorkshopTheme(mode: WorkshopMode = "light"): Theme {
         contrastText: "#FFFFFF",
       },
       secondary: {
-        main: section.optimize.accent,
+        main: secondary,
         contrastText: "#FFFFFF",
       },
       success: { main: isDark ? "#34D399" : "#15803D" },

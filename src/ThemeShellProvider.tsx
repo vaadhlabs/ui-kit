@@ -1,7 +1,8 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { CssBaseline, useMediaQuery } from "@mui/material";
 import { ThemeProvider as MuiThemeProvider } from "@mui/material/styles";
-import { createTensorTheme, type ThemeMode } from "./theme.js";
+import { type ThemeMode } from "./theme.js";
+import { createWorkshopTheme } from "./workshop-theme.js";
 
 export type ThemeSetting = "system" | "light" | "dark";
 
@@ -98,8 +99,16 @@ export function ThemeShellProvider({
     });
   }, [primaryColor, secondaryColor]);
 
+  // Workshop is now the app-wide default theme — every MF rendered
+  // inside the shell inherits its type scale (44px hero h1), 12px
+  // border radius, hairline-bordered Card surface, and section
+  // token palette. Per-tenant brand overrides still flow through
+  // so a white-labeled deployment keeps its primary / secondary.
+  // Individual pages that previously wrapped in createWorkshopTheme
+  // (dashboard, CFO, login) keep their wrappers as a no-op safety
+  // net for standalone rendering (vitest, Storybook).
   const theme = useMemo(
-    () => createTensorTheme(mode, { primary: brand.primary, secondary: brand.secondary }),
+    () => createWorkshopTheme(mode, { primary: brand.primary, secondary: brand.secondary }),
     [mode, brand.primary, brand.secondary],
   );
 
