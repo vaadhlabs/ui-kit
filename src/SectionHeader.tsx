@@ -39,9 +39,14 @@ export function SectionHeader({
     <Box
       sx={{
         display: "flex",
-        alignItems: "flex-start",
+        // On xs, the action slot stacks below the title to avoid the action
+        // chip overlaying a wrapped title — fixes the mobile overlap bug
+        // surfaced on /enforcement where "+ New policy" was sitting on top
+        // of "Enforcement Policies" wrapping to two lines.
+        flexDirection: { xs: "column", sm: "row" },
+        alignItems: { xs: "stretch", sm: "flex-start" },
         justifyContent: "space-between",
-        gap: 3,
+        gap: { xs: 1.5, sm: 3 },
         mb: 3,
       }}
     >
@@ -74,7 +79,19 @@ export function SectionHeader({
           </Typography>
         )}
       </Box>
-      {action && <Box sx={{ flexShrink: 0 }}>{action}</Box>}
+      {action && (
+        <Box
+          sx={{
+            // On sm+ the action is right-aligned next to the title; on xs it
+            // stacks below the subtitle. flexShrink:0 prevents the slot from
+            // being squeezed when the title is long.
+            flexShrink: 0,
+            alignSelf: { xs: "flex-start", sm: "auto" },
+          }}
+        >
+          {action}
+        </Box>
+      )}
     </Box>
   );
 }
