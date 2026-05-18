@@ -71,11 +71,30 @@ export function SectionHeader({
             </Typography>
           </Box>
         )}
-        <Typography variant="h2" sx={{ color: "text.primary", mb: subtitle ? 0.5 : 0 }}>
+        <Typography
+          variant="h2"
+          sx={{
+            color: "text.primary",
+            mb: subtitle ? 0.5 : 0,
+            // Workshop h2 defaults to 28px which is loud on a 375px-wide
+            // mobile viewport — section titles dominate the card content
+            // they introduce. Scale down to 20px on xs so the title
+            // anchors the section without competing with it.
+            fontSize: { xs: "1.25rem", md: "1.75rem" },
+            lineHeight: { xs: 1.2, md: 1.15 },
+          }}
+        >
           {title}
         </Typography>
         {subtitle && (
-          <Typography variant="body1" sx={{ color: "text.secondary", maxWidth: "60ch" }}>
+          <Typography
+            variant="body1"
+            sx={{
+              color: "text.secondary",
+              maxWidth: "60ch",
+              fontSize: { xs: "0.875rem", md: "1rem" },
+            }}
+          >
             {subtitle}
           </Typography>
         )}
