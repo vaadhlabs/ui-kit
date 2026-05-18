@@ -1,7 +1,7 @@
 import { createTheme, darken, getContrastRatio, lighten, type Theme } from "@mui/material/styles";
 
 /**
- * Tensor Cost design tokens, mirrored from apps/gpu-dashboard-frontend's
+ * TensorCost design tokens, mirrored from apps/gpu-dashboard-frontend's
  * ThemeContext.jsx so the migration looks identical. Exported as a factory so
  * the shell can swap light/dark at runtime.
  */
