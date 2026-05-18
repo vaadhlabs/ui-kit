@@ -5,6 +5,7 @@ export * from "./SectionHeader.js";
 export * from "./ThemeShellProvider.js";
 export * from "./MetricCard.js";
 export * from "./MetricCardWorkshop.js";
+export * from "./WorkshopCard.js";
 export * from "./tone.js";
 export * from "./charts.js";
 export * from "./DataTable.js";
