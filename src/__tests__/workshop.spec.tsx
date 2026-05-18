@@ -71,18 +71,20 @@ describe("useSection", () => {
 });
 
 describe("SectionHeader", () => {
-  it("renders kicker + title + subtitle inside a SectionProvider", () => {
+  it("renders title + subtitle; the kicker prop is now a no-op (eyebrow retired)", () => {
     const t = createWorkshopTheme();
-    const { getByText } = render(
+    const { getByText, queryByText } = render(
       <ThemeProvider theme={t}>
         <SectionProvider section="optimize">
           <SectionHeader kicker="OPTIMIZE" title="Routing" subtitle="What changed last week" />
         </SectionProvider>
       </ThemeProvider>,
     );
-    expect(getByText("OPTIMIZE")).toBeInTheDocument();
     expect(getByText("Routing")).toBeInTheDocument();
     expect(getByText("What changed last week")).toBeInTheDocument();
+    // Kicker text intentionally not rendered — section identity is
+    // carried by WorkshopCard's accent ribbon.
+    expect(queryByText("OPTIMIZE")).toBeNull();
   });
 });
 

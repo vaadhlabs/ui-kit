@@ -1,26 +1,25 @@
 import { Box, Typography } from "@mui/material";
 import type { ReactNode } from "react";
-import { useSection } from "./section.js";
 
 /**
- * Workshop section-header pattern: small uppercase kicker in the
- * section accent colour above a 28px h2 title, with optional eyebrow
- * actions on the right edge.
+ * Workshop section-header pattern: 28px h2 title with optional subtitle
+ * and an optional right-aligned action slot.
  *
- *   OBSERVE
  *   Real-time view of every workload          [time-window pill]
  *
- * Both kicker + bullet pull their colour from `useSection()` so the
- * same component drops into any section page and adopts the local
- * identity automatically. Outside a SectionProvider, the kicker falls
- * back to the theme primary and looks like a generic page header —
- * which is the right behaviour for shell-level pages that aren't part
- * of any section.
+ * Section identity is carried by WorkshopCard's accent ribbon, not by
+ * a dot+kicker eyebrow above the title. The earlier design had an
+ * uppercase kicker bullet in the section accent colour ("• OBSERVE")
+ * directly above the h2; that was deliberately removed — it duplicated
+ * the colour signal that WorkshopCard already provides and read as
+ * noise once every page carried one. The `kicker` prop survives the
+ * change as a no-op to keep the ~120 existing call sites valid without
+ * a sweep; callers can drop it lazily in their next edit.
  */
 export interface SectionHeaderProps {
-  /** Tiny uppercase eyebrow above the title. Typically the section
-   *  name in uppercase ("OBSERVE", "OPTIMIZE", etc) but consumers can
-   *  override per page. */
+  /** Deprecated — no longer rendered. Section accent is carried by
+   *  WorkshopCard's ribbon. Left in the prop signature so existing
+   *  call sites continue to type-check without a global rewrite. */
   kicker?: string;
   /** Required h2 title. */
   title: string;
@@ -32,12 +31,10 @@ export interface SectionHeaderProps {
 }
 
 export function SectionHeader({
-  kicker,
   title,
   subtitle,
   action,
 }: SectionHeaderProps): JSX.Element {
-  const { accent } = useSection();
   return (
     <Box
       sx={{
@@ -49,28 +46,6 @@ export function SectionHeader({
       }}
     >
       <Box sx={{ flex: 1, minWidth: 0 }}>
-        {kicker && (
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
-            {/* Section bullet — 8px circle in the accent colour. Sits
-               to the left of the kicker so the colour identity is the
-               first thing the eye lands on. */}
-            <Box
-              sx={{
-                width: 8,
-                height: 8,
-                borderRadius: "50%",
-                background: accent,
-                flexShrink: 0,
-              }}
-            />
-            <Typography
-              variant="overline"
-              sx={{ color: accent, lineHeight: 1, fontWeight: 700 }}
-            >
-              {kicker}
-            </Typography>
-          </Box>
-        )}
         <Typography
           variant="h2"
           sx={{
