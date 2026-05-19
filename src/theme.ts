@@ -73,8 +73,12 @@ const BRAND_TOKENS_LIGHT: BrandTokens = {
   bgPage: "#FAFBFC",
   bgSoft: "#F8FAFC",
   ink: "#0F172A",
-  ink2: "#475569",
-  ink3: "#94A3B8",
+  // ink2: was #475569 (slate-600, ~4.5:1 on white — borderline AA).
+  // Bumped to #334155 (slate-700, ~7:1) per user contrast feedback 2026-05-19.
+  ink2: "#334155",
+  // ink3: was #94A3B8 (slate-400, ~3.5:1 on white — fails AA).
+  // Bumped to #64748B (slate-500, ~4.6:1) per user contrast feedback 2026-05-19.
+  ink3: "#64748B",
   ink4: "#CBD5E1",
   border: "#E2E8F0",
   borderStrong: "#CBD5E1",
@@ -191,7 +195,8 @@ export function createTensorTheme(mode: ThemeMode, overrides?: { primary?: strin
           }
         : {
             background: { default: "#F1F5F9", paper: "#FFFFFF" },
-            text: { primary: "#0F172A", secondary: "#475569", disabled: "#64748B" },
+            // secondary was #475569; bumped to #334155 to match ink2 token.
+            text: { primary: "#0F172A", secondary: "#334155", disabled: "#64748B" },
             divider,
           }),
       grey: {
