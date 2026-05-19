@@ -1,0 +1,278 @@
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
+import { Box, ButtonBase } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
+
+// WorkflowPage — navrail primitive (2026-05-19)
+//
+// Spec: design_handoff_navigation_rail/README.md §Screens/A2 + §Interactions
+// Provides the sticky page header (title, subtitle, action slot) and a TOC
+// pill row. Children (WorkflowCards) are stacked with a 16px gap inside a
+// 1080px-max scrollable area.
+//
+// Scroll spy: IntersectionObserver with rootMargin "-140px 0px -50% 0px"
+// tracks which card is topmost-visible. Active TOC pill follows it.
+//
+// Deep linking: clicking a pill scrolls to the card's anchor + updates
+// location.hash. On mount, if location.hash matches an anchor, scrolls to
+// and sets focusedAnchor for the matching card.
+
+export interface TocItem {
+  /** Matches WorkflowCard anchor prop. */
+  key: string;
+  label: string;
+  /** Trailing mono hint shown inside the pill (e.g. "$55.1k 30d"). */
+  hint?: string;
+}
+
+export interface WorkflowPageProps {
+  title: string;
+  subtitle?: string;
+  /** Optional buttons/actions rendered top-right of the sticky header. */
+  actionSlot?: ReactNode;
+  /** TOC items — one per WorkflowCard. Order must match DOM order. */
+  tocItems: TocItem[];
+  children: ReactNode;
+  /** Called when a TOC pill is clicked. Host can use for additional side-effects. */
+  onTocClick?: (key: string) => void;
+}
+
+// Height of the sticky header in px — must match scrollMarginTop on WorkflowCard anchors.
+const STICKY_HEADER_HEIGHT = 140;
+
+export function WorkflowPage({
+  title,
+  subtitle,
+  actionSlot,
+  tocItems,
+  children,
+  onTocClick,
+}: WorkflowPageProps): JSX.Element {
+  const theme = useTheme();
+  const isDark = theme.palette.mode === "dark";
+  const brand = theme.palette.brand;
+
+  // Active anchor tracks which card is topmost-visible (scroll spy).
+  // Initial value: from location.hash, or the first TOC item.
+  const [activeAnchor, setActiveAnchor] = useState<string>(() => {
+    if (typeof window !== "undefined" && window.location.hash) {
+      const hash = window.location.hash.slice(1);
+      if (tocItems.some((t) => t.key === hash)) return hash;
+    }
+    return tocItems[0]?.key ?? "";
+  });
+
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // On mount: if hash matches an anchor, scroll to it and mark it active.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const hash = window.location.hash.slice(1);
+    if (!hash) return;
+    const target = document.getElementById(hash);
+    if (target) {
+      if (typeof target.scrollIntoView === "function") {
+        target.scrollIntoView();
+      }
+      setActiveAnchor(hash);
+    }
+    // Run once on mount only
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Scroll spy via IntersectionObserver.
+  // rootMargin: "-140px 0px -50% 0px" means we only count an element as
+  // "visible" when it's between the sticky header (140px from top) and the
+  // midpoint of the viewport. The topmost such element wins.
+  useEffect(() => {
+    if (typeof IntersectionObserver === "undefined") return;
+    const anchors = tocItems.map((t) => document.getElementById(t.key)).filter(Boolean) as HTMLElement[];
+    if (anchors.length === 0) return;
+
+    const visible = new Set<string>();
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          const id = entry.target.id;
+          if (entry.isIntersecting) {
+            visible.add(id);
+          } else {
+            visible.delete(id);
+          }
+        }
+        // Pick the topmost visible anchor (DOM order = tocItems order).
+        const topmost = tocItems.find((t) => visible.has(t.key));
+        if (topmost) setActiveAnchor(topmost.key);
+      },
+      { rootMargin: `-${STICKY_HEADER_HEIGHT}px 0px -50% 0px` },
+    );
+
+    for (const el of anchors) {
+      observer.observe(el);
+    }
+    return () => observer.disconnect();
+  }, [tocItems]);
+
+  const handlePillClick = useCallback(
+    (key: string) => {
+      const target = document.getElementById(key);
+      if (target && typeof target.scrollIntoView === "function") {
+        target.scrollIntoView({ behavior: "smooth" });
+      }
+      if (typeof window !== "undefined") {
+        window.location.hash = key;
+      }
+      setActiveAnchor(key);
+      onTocClick?.(key);
+    },
+    [onTocClick],
+  );
+
+  const stickyBg = isDark ? "rgba(30,41,59,0.94)" : "rgba(255,255,255,0.96)";
+  const border = brand?.border ?? "#E2E8F0";
+
+  return (
+    <Box
+      ref={containerRef}
+      component="main"
+      sx={{
+        flex: 1,
+        height: "100%",
+        overflowY: "auto",
+        background: brand?.paper ?? "#FFFFFF",
+        fontFamily: "'Inter', system-ui, sans-serif",
+        color: brand?.ink ?? "#0F172A",
+      }}
+    >
+      {/* Sticky page header */}
+      <Box
+        sx={{
+          position: "sticky",
+          top: 0,
+          background: stickyBg,
+          borderBottom: `1px solid ${border}`,
+          padding: "18px 32px 14px",
+          zIndex: 10,
+        }}
+      >
+        {/* Title row */}
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "flex-end",
+            justifyContent: "space-between",
+          }}
+        >
+          <Box>
+            <Box
+              component="h1"
+              sx={{
+                margin: 0,
+                fontSize: 26,
+                fontWeight: 600,
+                letterSpacing: "-0.02em",
+                color: brand?.ink ?? "#0F172A",
+                fontFamily: "'Inter', system-ui, sans-serif",
+              }}
+            >
+              {title}
+            </Box>
+            {subtitle && (
+              <Box
+                sx={{
+                  fontSize: 13,
+                  color: brand?.ink2 ?? "#475569",
+                  mt: "4px",
+                  fontFamily: "'Inter', system-ui, sans-serif",
+                }}
+              >
+                {subtitle}
+              </Box>
+            )}
+          </Box>
+          {actionSlot && (
+            <Box sx={{ display: "flex", gap: "8px" }}>{actionSlot}</Box>
+          )}
+        </Box>
+
+        {/* TOC pill row */}
+        <Box
+          component="nav"
+          aria-label="Page sections"
+          sx={{
+            display: "flex",
+            gap: "2px",
+            mt: "14px",
+            flexWrap: "wrap",
+          }}
+        >
+          {tocItems.map((item) => {
+            const isActive = item.key === activeAnchor;
+            return (
+              <ButtonBase
+                key={item.key}
+                component="button"
+                onClick={() => handlePillClick(item.key)}
+                aria-current={isActive ? "true" : undefined}
+                sx={{
+                  height: 28,
+                  px: "10px",
+                  borderRadius: "6px",
+                  background: isActive ? (brand?.ink ?? "#0F172A") : "transparent",
+                  color: isActive ? (brand?.paper ?? "#FFFFFF") : (brand?.ink2 ?? "#475569"),
+                  border: "none",
+                  cursor: "pointer",
+                  fontFamily: "'Inter', system-ui, sans-serif",
+                  fontSize: 12,
+                  fontWeight: isActive ? 600 : 500,
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  // No position animation — just color swap per spec §Interactions
+                  transition: `background ${brand?.motionFast ?? "150ms cubic-bezier(0.4,0,0.2,1)"}, color ${brand?.motionFast ?? "150ms"}`,
+                  "&:focus-visible": {
+                    outline: `2px solid ${brand?.blue ?? "#3B82F6"}`,
+                    outlineOffset: 2,
+                  },
+                }}
+              >
+                {item.label}
+                {item.hint && (
+                  <Box
+                    component="span"
+                    sx={{
+                      fontSize: "10.5px",
+                      fontFamily: brand?.mono ?? "'JetBrains Mono', monospace",
+                      color: isActive ? "rgba(248,250,252,0.6)" : (brand?.ink3 ?? "#94A3B8"),
+                    }}
+                  >
+                    {item.hint}
+                  </Box>
+                )}
+              </ButtonBase>
+            );
+          })}
+        </Box>
+      </Box>
+
+      {/* Scrollable content — WorkflowCard children */}
+      <Box
+        sx={{
+          padding: "20px 32px 40px",
+          display: "flex",
+          flexDirection: "column",
+          gap: "16px",
+          maxWidth: 1080,
+        }}
+      >
+        {children}
+      </Box>
+    </Box>
+  );
+}
