@@ -109,3 +109,33 @@ describe("MobileTopBar", () => {
     expect(screen.getByRole("heading", { level: 1 })).toBeInTheDocument();
   });
 });
+
+// ---------------------------------------------------------------------------
+// logoSlot — user feedback 2026-05-19
+// ---------------------------------------------------------------------------
+
+describe("MobileTopBar — logoSlot prop", () => {
+  it("renders logoSlot node when provided", () => {
+    render(
+      <Wrapper>
+        <MobileTopBar
+          title="Cost ops"
+          alertsCount={0}
+          onMenu={vi.fn()}
+          logoSlot={<span>REAL-LOGO</span>}
+        />
+      </Wrapper>,
+    );
+    expect(screen.getByText("REAL-LOGO")).toBeInTheDocument();
+    expect(screen.queryByText("TensorCost")).not.toBeInTheDocument();
+  });
+
+  it("falls back to gradient + TensorCost text when logoSlot is omitted", () => {
+    render(
+      <Wrapper>
+        <MobileTopBar title="Cost ops" alertsCount={0} onMenu={vi.fn()} />
+      </Wrapper>,
+    );
+    expect(screen.getByText("TensorCost")).toBeInTheDocument();
+  });
+});

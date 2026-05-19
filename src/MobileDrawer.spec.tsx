@@ -197,3 +197,20 @@ describe("MobileDrawer — dark mode", () => {
     expect(screen.getByText("TensorCost")).toBeInTheDocument();
   });
 });
+
+// ---------------------------------------------------------------------------
+// logoSlot — user feedback 2026-05-19
+// ---------------------------------------------------------------------------
+
+describe("MobileDrawer — logoSlot prop", () => {
+  it("renders logoSlot node when provided", () => {
+    renderDrawer({ logoSlot: <span>REAL-LOGO</span> });
+    expect(screen.getByText("REAL-LOGO")).toBeInTheDocument();
+    expect(screen.queryByText("TensorCost")).not.toBeInTheDocument();
+  });
+
+  it("falls back to gradient + TensorCost text when logoSlot is omitted", () => {
+    renderDrawer();
+    expect(screen.getByText("TensorCost")).toBeInTheDocument();
+  });
+});

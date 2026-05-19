@@ -362,3 +362,37 @@ describe("RailSidebar — collapsed-mode tooltips", () => {
     expect(homeLink).toBeInTheDocument();
   });
 });
+
+// ---------------------------------------------------------------------------
+// logoSlot — user feedback 2026-05-19
+// ---------------------------------------------------------------------------
+
+describe("RailSidebar — logoSlot prop", () => {
+  it("renders logoSlot.expanded content when expanded", () => {
+    renderSidebar({
+      defaultCollapsed: false,
+      logoSlot: {
+        collapsed: <span>MARK</span>,
+        expanded: <span>LOCKUP</span>,
+      },
+    });
+    // Expanded lockup should be present (may not be visible in jsdom if opacity=0,
+    // but the node is in the DOM).
+    expect(screen.getByText("LOCKUP")).toBeInTheDocument();
+  });
+
+  it("renders logoSlot.collapsed content when collapsed", () => {
+    renderSidebar({
+      logoSlot: {
+        collapsed: <span>MARK</span>,
+        expanded: <span>LOCKUP</span>,
+      },
+    });
+    expect(screen.getByText("MARK")).toBeInTheDocument();
+  });
+
+  it("renders gradient fallback + TensorCost wordmark when logoSlot is omitted (backwards compat)", () => {
+    renderSidebar({ defaultCollapsed: false });
+    expect(screen.getByText("TensorCost")).toBeInTheDocument();
+  });
+});

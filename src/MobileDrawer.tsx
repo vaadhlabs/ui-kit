@@ -1,4 +1,4 @@
-import { useEffect, useRef, type ComponentType } from "react";
+import { useEffect, useRef, type ComponentType, type ReactNode } from "react";
 import { Box, ButtonBase, IconButton, Tooltip } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import {
@@ -46,6 +46,14 @@ export interface MobileDrawerProps {
   onItemClick?: (item: MobileNavItem) => void;
   onTenantClick?: () => void;
   onUserSettingsClick?: () => void;
+  /**
+   * Real logo slot — user feedback 2026-05-19. When provided, the gradient
+   * square + "TensorCost" text are replaced with the supplied node. Use
+   * <Brand variant="mark" size={28} /> (the drawer is wider than the top bar
+   * but there's still not room for the full lockup next to the tenant chip).
+   * Falls back to gradient + text when omitted.
+   */
+  logoSlot?: ReactNode;
 }
 
 // Swipe detection threshold in px per spec.
@@ -63,6 +71,7 @@ export function MobileDrawer({
   onItemClick,
   onTenantClick,
   onUserSettingsClick,
+  logoSlot,
 }: MobileDrawerProps): JSX.Element {
   const theme = useTheme();
   const isDark = theme.palette.mode === "dark";
@@ -165,20 +174,25 @@ export function MobileDrawer({
       >
         {/* Brand */}
         <Box sx={{ padding: "14px 16px 12px", display: "flex", alignItems: "center", gap: "8px" }}>
-          <Box
-            component="span"
-            aria-hidden="true"
-            sx={{
-              width: 22,
-              height: 22,
-              borderRadius: "6px",
-              background: `linear-gradient(135deg, ${blue} 0%, ${cyan} 100%)`,
-              flexShrink: 0,
-            }}
-          />
-          <Box component="span" sx={{ fontWeight: 700, fontSize: 14, letterSpacing: "-0.02em", color: ink }}>
-            TensorCost
-          </Box>
+          {logoSlot ?? (
+            /* Fallback: gradient mark + text */
+            <>
+              <Box
+                component="span"
+                aria-hidden="true"
+                sx={{
+                  width: 22,
+                  height: 22,
+                  borderRadius: "6px",
+                  background: `linear-gradient(135deg, ${blue} 0%, ${cyan} 100%)`,
+                  flexShrink: 0,
+                }}
+              />
+              <Box component="span" sx={{ fontWeight: 700, fontSize: 14, letterSpacing: "-0.02em", color: ink }}>
+                TensorCost
+              </Box>
+            </>
+          )}
         </Box>
 
         {/* Tenant chip */}

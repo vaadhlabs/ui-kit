@@ -1,4 +1,4 @@
-import { type ComponentType, useEffect, useRef, useState } from "react";
+import { type ComponentType, type ReactNode, useEffect, useRef, useState } from "react";
 import { Box, ButtonBase, IconButton, Tooltip } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import {
@@ -63,6 +63,24 @@ export interface RailSidebarUser {
   avatarUrl?: string;
 }
 
+/**
+ * Real logo slot — user feedback 2026-05-19.
+ *
+ * When provided, the gradient placeholder square is replaced with the caller's
+ * nodes. Two variants because the sidebar collapses to icon-rail width:
+ *   collapsed: rendered when the rail is in its narrow (56px) state — use the
+ *              icon mark (e.g. <Brand variant="mark" size={32} />).
+ *   expanded:  rendered when the rail is expanded — use the lockup wordmark
+ *              (e.g. <Brand variant="lockup" size={28} />).
+ *
+ * When omitted, the original gradient square + "TensorCost" text renders as
+ * before, so Storybook and tests that don't pass this prop keep working.
+ */
+export interface LogoSlot {
+  collapsed: ReactNode;
+  expanded: ReactNode;
+}
+
 export interface RailSidebarProps {
   active: string;
   items: NavItem[];
@@ -86,6 +104,11 @@ export interface RailSidebarProps {
    */
   pinned?: boolean;
   onPinChange?: (pinned: boolean) => void;
+  /**
+   * Real logo slot (user feedback 2026-05-19). When provided, replaces the
+   * hard-coded gradient square with caller-supplied nodes. See LogoSlot.
+   */
+  logoSlot?: LogoSlot;
 }
 
 const COLLAPSED_WIDTH = 56;
@@ -116,6 +139,7 @@ export function RailSidebar({
   defaultCollapsed = true,
   pinned: externalPinned,
   onPinChange,
+  logoSlot,
 }: RailSidebarProps): JSX.Element {
   const theme = useTheme();
   const isDark = theme.palette.mode === "dark";
@@ -241,35 +265,80 @@ export function RailSidebar({
           position: "relative",
         }}
       >
-        {/* Gradient logo dot 22×22 */}
-        <Box
-          component="span"
-          aria-hidden="true"
-          sx={{
-            width: 22,
-            height: 22,
-            borderRadius: "6px",
-            background: `linear-gradient(135deg, ${blue} 0%, ${cyan} 100%)`,
-            flexShrink: 0,
-          }}
-        />
-        {/* Wordmark — hidden in collapsed mode via overflow:hidden on the parent */}
-        <Box
-          component="span"
-          sx={{
-            fontWeight: 700,
-            fontSize: 14,
-            letterSpacing: "-0.02em",
-            color: ink,
-            opacity: isExpanded ? 1 : 0,
-            transition: `opacity ${motionFast}`,
-            whiteSpace: "nowrap",
-            overflow: "hidden",
-            flex: 1,
-          }}
-        >
-          TensorCost
-        </Box>
+        {logoSlot ? (
+          /*
+           * Real logo path — user feedback 2026-05-19.
+           * Collapsed: show the icon mark only (narrow rail).
+           * Expanded: cross-fade to the lockup wordmark.
+           * Both nodes are kept in the DOM so the transition is smooth;
+           * opacity + pointer-events toggling avoids layout shift.
+           */
+          <>
+            {/* Collapsed mark — visible only in icon-rail mode */}
+            <Box
+              component="span"
+              sx={{
+                flexShrink: 0,
+                opacity: isExpanded ? 0 : 1,
+                transition: `opacity ${motionFast}`,
+                position: isExpanded ? "absolute" : "static",
+                pointerEvents: isExpanded ? "none" : "auto",
+                display: "flex",
+                alignItems: "center",
+              }}
+              aria-hidden={isExpanded}
+            >
+              {logoSlot.collapsed}
+            </Box>
+            {/* Expanded lockup — visible only when rail is open */}
+            <Box
+              component="span"
+              sx={{
+                flex: 1,
+                minWidth: 0,
+                opacity: isExpanded ? 1 : 0,
+                transition: `opacity ${motionFast}`,
+                pointerEvents: isExpanded ? "auto" : "none",
+                display: "flex",
+                alignItems: "center",
+              }}
+              aria-hidden={!isExpanded}
+            >
+              {logoSlot.expanded}
+            </Box>
+          </>
+        ) : (
+          /* Fallback — original gradient square + text (keeps Storybook / tests green) */
+          <>
+            <Box
+              component="span"
+              aria-hidden="true"
+              sx={{
+                width: 22,
+                height: 22,
+                borderRadius: "6px",
+                background: `linear-gradient(135deg, ${blue} 0%, ${cyan} 100%)`,
+                flexShrink: 0,
+              }}
+            />
+            <Box
+              component="span"
+              sx={{
+                fontWeight: 700,
+                fontSize: 14,
+                letterSpacing: "-0.02em",
+                color: ink,
+                opacity: isExpanded ? 1 : 0,
+                transition: `opacity ${motionFast}`,
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                flex: 1,
+              }}
+            >
+              TensorCost
+            </Box>
+          </>
+        )}
 
         {/* Pin button — only visible when expanded */}
         {isExpanded && (

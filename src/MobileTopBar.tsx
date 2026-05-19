@@ -1,3 +1,4 @@
+import { type ReactNode } from "react";
 import { Box, IconButton, Badge } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import {
@@ -24,6 +25,13 @@ export interface MobileTopBarProps {
   alertsCount: number;
   onMenu: () => void;
   onAlerts?: () => void;
+  /**
+   * Real logo slot — user feedback 2026-05-19. When provided, the gradient
+   * square + "TensorCost" text are replaced with the supplied node. Use
+   * <Brand variant="mark" size={24} /> here (mark-only; no room for a lockup
+   * in the narrow top bar). Falls back to gradient + text when omitted.
+   */
+  logoSlot?: ReactNode;
 }
 
 export function MobileTopBar({
@@ -32,6 +40,7 @@ export function MobileTopBar({
   alertsCount,
   onMenu,
   onAlerts,
+  logoSlot,
 }: MobileTopBarProps): JSX.Element {
   const theme = useTheme();
   const isDark = theme.palette.mode === "dark";
@@ -87,30 +96,34 @@ export function MobileTopBar({
 
         {/* Brand + tenant (center) */}
         <Box sx={{ flex: 1, display: "flex", alignItems: "center", gap: "6px" }}>
-          {/* Gradient logo mark 18×18 */}
-          <Box
-            component="span"
-            aria-hidden="true"
-            sx={{
-              width: 18,
-              height: 18,
-              borderRadius: "5px",
-              background: `linear-gradient(135deg, ${blue} 0%, ${cyan} 100%)`,
-              flexShrink: 0,
-            }}
-          />
-          <Box
-            component="span"
-            sx={{
-              fontWeight: 700,
-              fontSize: 13,
-              color: ink,
-              letterSpacing: "-0.02em",
-              fontFamily: "'Inter', system-ui, sans-serif",
-            }}
-          >
-            TensorCost
-          </Box>
+          {logoSlot ?? (
+            /* Fallback: gradient mark + text */
+            <>
+              <Box
+                component="span"
+                aria-hidden="true"
+                sx={{
+                  width: 18,
+                  height: 18,
+                  borderRadius: "5px",
+                  background: `linear-gradient(135deg, ${blue} 0%, ${cyan} 100%)`,
+                  flexShrink: 0,
+                }}
+              />
+              <Box
+                component="span"
+                sx={{
+                  fontWeight: 700,
+                  fontSize: 13,
+                  color: ink,
+                  letterSpacing: "-0.02em",
+                  fontFamily: "'Inter', system-ui, sans-serif",
+                }}
+              >
+                TensorCost
+              </Box>
+            </>
+          )}
         </Box>
 
         {/* Bell + badge */}
