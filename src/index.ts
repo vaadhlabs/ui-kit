@@ -14,3 +14,13 @@ export * from "./RowDetailsDialog.js";
 export * from "./SavingsBanner.js";
 export * from "./useSavingsBanner.js";
 export * from "./RequireRole.js";
+
+// Navrail (2026-05-19) — Rail redesign primitives
+// Spec: design_handoff_navigation_rail/README.md
+export * from "./StatusBadge.js";
+export * from "./WorkflowCard.js";
+export * from "./WorkflowPage.js";
+export * from "./RailSidebar.js";
+export * from "./MobileTopBar.js";
+export * from "./MobileDrawer.js";
+export * from "./RowPreviewDrawer.js";
