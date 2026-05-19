@@ -1,28 +1,46 @@
-import { type ComponentType } from "react";
+import { type ComponentType, useEffect, useRef, useState } from "react";
 import { Box, ButtonBase, IconButton, Tooltip } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import {
   UnfoldMore as UnfoldMoreIcon,
   Search as SearchIcon,
   Settings as SettingsIcon,
+  PushPin as PushPinIcon,
+  PushPinOutlined as PushPinOutlinedIcon,
 } from "@mui/icons-material";
 
-// RailSidebar — navrail primitive (2026-05-19)
+// RailSidebar — navrail primitive (2026-05-19, user override 2026-05-19)
 //
-// Spec: design_handoff_navigation_rail/README.md §Sidebar zones
-// Static 240px wide, full-height, never collapses on desktop (≥1024px).
-// Below 768px: parent renders mobile chrome instead — this component is
-// pure desktop and does NOT handle the mobile breakpoint itself.
+// User override: spec said "always 240px, never collapses." User overrides
+// to collapse-by-default (56px icon rail) with hover-to-expand + click-to-pin.
 //
 // Five zones (top → bottom):
-//   1. Brand: gradient logo dot 22×22 + "TensorCost" wordmark Inter 14/700
-//   2. Tenant chip: full-width button, cyan dot + tenant/env + unfold icon
-//   3. Search: 32px tall, leading magnifier, ⌘K kbd hint right-aligned
-//   4. Item list: scrollable, 36px rows, icon tile 24×24/6px-radius, badge/hint
-//   5. User footer: 28px avatar + email + role mono caption + settings icon
+//   1. Brand: gradient dot + "TensorCost" wordmark (collapsed: dot only)
+//   2. Tenant chip: full-width button (collapsed: HIDDEN)
+//   3. Search: 32px (collapsed: HIDDEN)
+//   4. Item list: scrollable, icon-only in collapsed mode with tooltips
+//   5. User footer: avatar (collapsed: avatar only)
 //
-// Props contract: host passes `active` key and handles all navigation.
-// This component does NOT watch location.pathname — single source of truth.
+// Expand behavior:
+//   - Hover: expands after 100ms delay, collapses 200ms after mouseLeave
+//   - Pin button (top-right when expanded): locks open; persists in localStorage
+//   - defaultCollapsed: default true (collapse-by-default user override)
+
+export type NavItemKey =
+  | "home"
+  | "costs"
+  | "gpu"
+  | "ai"
+  | "monitoring"
+  | "savings"
+  | "routing"
+  | "reports"
+  | "alerts"
+  | "enforcement"
+  | "compliance"
+  | "admin"
+  | "integrations"
+  | "settings";
 
 export interface NavItemBadge {
   kind: "ok" | "warn" | "danger" | "info";
@@ -57,7 +75,22 @@ export interface RailSidebarProps {
   onUserSettingsClick?: () => void;
   /** Called when a nav item is clicked. Host handles actual navigation. */
   onItemClick?: (item: NavItem) => void;
+  /**
+   * Whether the sidebar starts collapsed.
+   * Defaults to true — the user override from 2026-05-19.
+   */
+  defaultCollapsed?: boolean;
+  /**
+   * External pin state (host-controlled). When pinned the sidebar stays
+   * expanded even after mouseLeave. Persist via onPinChange.
+   */
+  pinned?: boolean;
+  onPinChange?: (pinned: boolean) => void;
 }
+
+const COLLAPSED_WIDTH = 56;
+const EXPANDED_WIDTH = 240;
+const LS_PIN_KEY = "tensorcost.navrail.pinned";
 
 function badgeColor(kind: NavItemBadge["kind"], isDark: boolean): string {
   switch (kind) {
@@ -80,12 +113,83 @@ export function RailSidebar({
   onTenantClick,
   onUserSettingsClick,
   onItemClick,
+  defaultCollapsed = true,
+  pinned: externalPinned,
+  onPinChange,
 }: RailSidebarProps): JSX.Element {
   const theme = useTheme();
   const isDark = theme.palette.mode === "dark";
   const b = theme.palette.brand;
 
-  // Derived avatar initial — first char of email, uppercased.
+  // Internal pin state — used when the host doesn't supply pinned/onPinChange.
+  const [internalPinned, setInternalPinned] = useState<boolean>(() => {
+    // On first mount, read the localStorage preference.
+    try {
+      return localStorage.getItem(LS_PIN_KEY) === "true";
+    } catch {
+      return false;
+    }
+  });
+
+  // The "effective" pin state: host-controlled if prop is provided, else internal.
+  const isControlled = externalPinned !== undefined;
+  const isPinned = isControlled ? (externalPinned ?? false) : internalPinned;
+
+  const togglePin = (): void => {
+    const next = !isPinned;
+    if (isControlled) {
+      onPinChange?.(next);
+    } else {
+      setInternalPinned(next);
+    }
+    try {
+      localStorage.setItem(LS_PIN_KEY, next ? "true" : "false");
+    } catch {
+      // localStorage not available in this env — non-fatal
+    }
+  };
+
+  // Hover-expand state (ignores pinned — pinned stays expanded regardless).
+  const [hoverExpanded, setHoverExpanded] = useState(false);
+  const expandTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const collapseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Whether the sidebar is currently showing in expanded layout.
+  // Pinned → always expanded. Hover-expanded → also expanded. Otherwise collapsed.
+  // When defaultCollapsed=false, start in expanded state unless the pin says otherwise.
+  const [forcedOpen] = useState(!defaultCollapsed && !isPinned);
+  const isExpanded = isPinned || hoverExpanded || forcedOpen;
+
+  const handleMouseEnter = (): void => {
+    if (isPinned) return; // already locked open
+    if (collapseTimer.current) {
+      clearTimeout(collapseTimer.current);
+      collapseTimer.current = null;
+    }
+    expandTimer.current = setTimeout(() => {
+      setHoverExpanded(true);
+    }, 100); // 100ms delay per spec — brushing past doesn't trigger
+  };
+
+  const handleMouseLeave = (): void => {
+    if (isPinned) return; // locked — don't collapse
+    if (expandTimer.current) {
+      clearTimeout(expandTimer.current);
+      expandTimer.current = null;
+    }
+    collapseTimer.current = setTimeout(() => {
+      setHoverExpanded(false);
+    }, 200); // 200ms delay per spec
+  };
+
+  // Clean up timers on unmount.
+  useEffect(() => {
+    return () => {
+      if (expandTimer.current) clearTimeout(expandTimer.current);
+      if (collapseTimer.current) clearTimeout(collapseTimer.current);
+    };
+  }, []);
+
   const avatarInitial = user.email.charAt(0).toUpperCase();
 
   const sidebarBg = b?.bgPage ?? (isDark ? "#0F172A" : "#FAFBFC");
@@ -101,11 +205,15 @@ export function RailSidebar({
 
   const iconTileBg = isDark ? "rgba(255,255,255,0.04)" : "#F1F5F9";
 
+  const currentWidth = isExpanded ? EXPANDED_WIDTH : COLLAPSED_WIDTH;
+
   return (
     <Box
       component="aside"
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
       sx={{
-        width: 240,
+        width: currentWidth,
         flexShrink: 0,
         background: sidebarBg,
         borderRight: `1px solid ${border}`,
@@ -113,6 +221,10 @@ export function RailSidebar({
         flexDirection: "column",
         height: "100%",
         fontFamily: "'Inter', system-ui, sans-serif",
+        // Smooth width transition — 150ms matches design system motion token.
+        transition: `width ${motionFast}`,
+        overflow: "hidden",
+        position: "relative",
         // Desktop-only: hide below 768px; parent renders MobileTopBar instead.
         "@media (max-width: 767px)": { display: "none" },
       }}
@@ -124,6 +236,9 @@ export function RailSidebar({
           display: "flex",
           alignItems: "center",
           gap: "8px",
+          flexShrink: 0,
+          minWidth: 0,
+          position: "relative",
         }}
       >
         {/* Gradient logo dot 22×22 */}
@@ -138,6 +253,7 @@ export function RailSidebar({
             flexShrink: 0,
           }}
         />
+        {/* Wordmark — hidden in collapsed mode via overflow:hidden on the parent */}
         <Box
           component="span"
           sx={{
@@ -145,17 +261,56 @@ export function RailSidebar({
             fontSize: 14,
             letterSpacing: "-0.02em",
             color: ink,
+            opacity: isExpanded ? 1 : 0,
+            transition: `opacity ${motionFast}`,
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            flex: 1,
           }}
         >
           TensorCost
         </Box>
+
+        {/* Pin button — only visible when expanded */}
+        {isExpanded && (
+          <Tooltip title={isPinned ? "Unpin sidebar" : "Pin sidebar open"}>
+            <IconButton
+              size="small"
+              onClick={togglePin}
+              aria-label={isPinned ? "Unpin sidebar" : "Pin sidebar open"}
+              aria-pressed={isPinned}
+              sx={{
+                color: isPinned ? blue : ink3,
+                padding: "2px",
+                flexShrink: 0,
+                "&:focus-visible": { outline: `2px solid ${blue}`, outlineOffset: 2 },
+              }}
+            >
+              {isPinned ? (
+                <PushPinIcon sx={{ fontSize: 14 }} />
+              ) : (
+                <PushPinOutlinedIcon sx={{ fontSize: 14 }} />
+              )}
+            </IconButton>
+          </Tooltip>
+        )}
       </Box>
 
-      {/* Zone 2 — Tenant chip */}
-      <Box sx={{ padding: "0 12px 10px" }}>
+      {/* Zone 2 — Tenant chip (hidden in collapsed mode) */}
+      <Box
+        sx={{
+          padding: "0 12px 10px",
+          opacity: isExpanded ? 1 : 0,
+          height: isExpanded ? "auto" : 0,
+          overflow: "hidden",
+          transition: `opacity ${motionFast}`,
+          flexShrink: 0,
+        }}
+      >
         <ButtonBase
           onClick={onTenantClick}
           aria-label={`Switch tenant: ${tenant} / ${env}`}
+          tabIndex={isExpanded ? 0 : -1}
           sx={{
             appearance: "none",
             width: "100%",
@@ -197,12 +352,22 @@ export function RailSidebar({
         </ButtonBase>
       </Box>
 
-      {/* Zone 3 — Search input */}
-      <Box sx={{ padding: "0 12px 10px" }}>
+      {/* Zone 3 — Search input (hidden in collapsed mode) */}
+      <Box
+        sx={{
+          padding: "0 12px 10px",
+          opacity: isExpanded ? 1 : 0,
+          height: isExpanded ? "auto" : 0,
+          overflow: "hidden",
+          transition: `opacity ${motionFast}`,
+          flexShrink: 0,
+        }}
+      >
         <ButtonBase
           onClick={onSearch}
           aria-label="Search (⌘K)"
           role="searchbox"
+          tabIndex={isExpanded ? 0 : -1}
           sx={{
             display: "flex",
             alignItems: "center",
@@ -257,7 +422,9 @@ export function RailSidebar({
         sx={{
           flex: 1,
           overflowY: "auto",
-          padding: "4px 8px 12px",
+          overflowX: "hidden",
+          padding: isExpanded ? "4px 8px 12px" : "4px 4px 12px",
+          transition: `padding ${motionFast}`,
         }}
       >
         {items.map((item) => {
@@ -268,7 +435,14 @@ export function RailSidebar({
           const bKind = item.badge?.kind ?? "danger";
           const bColor = hasBadge ? badgeColor(bKind, isDark) : undefined;
 
-          return (
+          // Build tooltip content: label + hint/badge if present.
+          const tooltipLabel = item.hint
+            ? `${item.label} — ${item.hint}`
+            : hasBadge
+            ? `${item.label} (${badgeCount})`
+            : item.label;
+
+          const itemButton = (
             <ButtonBase
               key={item.key}
               component="a"
@@ -284,9 +458,10 @@ export function RailSidebar({
               sx={{
                 display: "flex",
                 alignItems: "center",
-                gap: "10px",
+                gap: isExpanded ? "10px" : 0,
                 width: "100%",
-                padding: "8px 10px",
+                padding: isExpanded ? "8px 10px" : "8px 6px",
+                justifyContent: isExpanded ? "flex-start" : "center",
                 margin: "1px 0",
                 background: isActive ? paper : "transparent",
                 border: isActive ? `1px solid ${border}` : "1px solid transparent",
@@ -301,7 +476,7 @@ export function RailSidebar({
                 color: isActive ? ink : ink2,
                 fontWeight: isActive ? 600 : 500,
                 letterSpacing: "-0.005em",
-                transition: `background ${motionFast}, color ${motionFast}`,
+                transition: `background ${motionFast}, color ${motionFast}, padding ${motionFast}, gap ${motionFast}`,
                 textDecoration: "none",
                 "&:focus-visible": {
                   outline: `2px solid ${blue}`,
@@ -333,13 +508,23 @@ export function RailSidebar({
                 />
               </Box>
 
-              {/* Label */}
-              <Box component="span" sx={{ flex: 1 }}>
+              {/* Label — hidden in collapsed mode */}
+              <Box
+                component="span"
+                sx={{
+                  flex: 1,
+                  opacity: isExpanded ? 1 : 0,
+                  width: isExpanded ? "auto" : 0,
+                  overflow: "hidden",
+                  whiteSpace: "nowrap",
+                  transition: `opacity ${motionFast}`,
+                }}
+              >
                 {item.label}
               </Box>
 
-              {/* Badge or hint */}
-              {hasBadge ? (
+              {/* Badge or hint — only visible when expanded */}
+              {isExpanded && hasBadge ? (
                 <Box
                   component="span"
                   aria-label={`${badgeCount} ${item.key} alerts`}
@@ -356,23 +541,62 @@ export function RailSidebar({
                     fontSize: 10,
                     fontWeight: 700,
                     fontFamily: mono,
+                    flexShrink: 0,
                   }}
                 >
                   {badgeCount}
                 </Box>
-              ) : item.hint ? (
+              ) : isExpanded && item.hint ? (
                 <Box
                   component="span"
                   sx={{
                     fontSize: "10.5px",
                     color: ink3,
                     fontFamily: mono,
+                    flexShrink: 0,
                   }}
                 >
                   {item.hint}
                 </Box>
               ) : null}
+
+              {/* Collapsed-mode badge dot — tiny indicator so the badge isn't entirely invisible */}
+              {!isExpanded && hasBadge ? (
+                <Box
+                  component="span"
+                  aria-hidden="true"
+                  sx={{
+                    position: "absolute",
+                    top: 4,
+                    right: 4,
+                    width: 6,
+                    height: 6,
+                    borderRadius: "50%",
+                    background: bColor,
+                  }}
+                />
+              ) : null}
             </ButtonBase>
+          );
+
+          // Wrap with tooltip when collapsed for keyboard/pointer discoverability.
+          return !isExpanded ? (
+            <Tooltip
+              key={item.key}
+              title={tooltipLabel}
+              placement="right"
+              enterDelay={0}
+              enterNextDelay={0}
+            >
+              {/* Tooltip needs a single forwardRef child — Box wrapper here */}
+              <Box sx={{ position: "relative" }}>
+                {itemButton}
+              </Box>
+            </Tooltip>
+          ) : (
+            <Box key={item.key} sx={{ position: "relative" }}>
+              {itemButton}
+            </Box>
           );
         })}
       </Box>
@@ -380,11 +604,15 @@ export function RailSidebar({
       {/* Zone 5 — User footer */}
       <Box
         sx={{
-          padding: "12px 14px",
+          padding: isExpanded ? "12px 14px" : "12px 8px",
           borderTop: `1px solid ${border}`,
           display: "flex",
           alignItems: "center",
-          gap: "10px",
+          gap: isExpanded ? "10px" : 0,
+          justifyContent: isExpanded ? "flex-start" : "center",
+          transition: `padding ${motionFast}, gap ${motionFast}`,
+          flexShrink: 0,
+          overflow: "hidden",
         }}
       >
         {/* Avatar circle 28px */}
@@ -422,8 +650,17 @@ export function RailSidebar({
           </Box>
         )}
 
-        {/* Email + role */}
-        <Box sx={{ flex: 1, minWidth: 0 }}>
+        {/* Email + role — hidden in collapsed mode */}
+        <Box
+          sx={{
+            flex: 1,
+            minWidth: 0,
+            opacity: isExpanded ? 1 : 0,
+            width: isExpanded ? "auto" : 0,
+            overflow: "hidden",
+            transition: `opacity ${motionFast}`,
+          }}
+        >
           <Box
             sx={{
               fontSize: 12.5,
@@ -451,21 +688,24 @@ export function RailSidebar({
           </Box>
         </Box>
 
-        {/* Settings icon */}
-        <Tooltip title="Settings">
-          <IconButton
-            size="small"
-            onClick={onUserSettingsClick}
-            aria-label="User settings"
-            sx={{
-              color: ink3,
-              padding: "4px",
-              "&:focus-visible": { outline: `2px solid ${blue}`, outlineOffset: 2 },
-            }}
-          >
-            <SettingsIcon sx={{ fontSize: 14 }} />
-          </IconButton>
-        </Tooltip>
+        {/* Settings icon — only shown in expanded mode */}
+        {isExpanded && (
+          <Tooltip title="Settings">
+            <IconButton
+              size="small"
+              onClick={onUserSettingsClick}
+              aria-label="User settings"
+              sx={{
+                color: ink3,
+                padding: "4px",
+                flexShrink: 0,
+                "&:focus-visible": { outline: `2px solid ${blue}`, outlineOffset: 2 },
+              }}
+            >
+              <SettingsIcon sx={{ fontSize: 14 }} />
+            </IconButton>
+          </Tooltip>
+        )}
       </Box>
     </Box>
   );
