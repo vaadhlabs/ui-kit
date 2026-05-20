@@ -199,6 +199,46 @@ describe("MobileDrawer — dark mode", () => {
 });
 
 // ---------------------------------------------------------------------------
+// onEnvClick — split tenant chip
+// ---------------------------------------------------------------------------
+
+describe("MobileDrawer — onEnvClick (split chip)", () => {
+  it("renders two separate buttons when onEnvClick is provided", () => {
+    const onTenantClick = vi.fn();
+    const onEnvClick = vi.fn();
+    renderDrawer({ onTenantClick, onEnvClick });
+    expect(screen.getByRole("button", { name: /switch tenant: acme/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /switch environment: production/i })).toBeInTheDocument();
+  });
+
+  it("left zone fires onTenantClick", () => {
+    const onTenantClick = vi.fn();
+    const onEnvClick = vi.fn();
+    renderDrawer({ onTenantClick, onEnvClick });
+    fireEvent.click(screen.getByRole("button", { name: /switch tenant: acme/i }));
+    expect(onTenantClick).toHaveBeenCalledOnce();
+    expect(onEnvClick).not.toHaveBeenCalled();
+  });
+
+  it("right zone fires onEnvClick", () => {
+    const onTenantClick = vi.fn();
+    const onEnvClick = vi.fn();
+    renderDrawer({ onTenantClick, onEnvClick });
+    fireEvent.click(screen.getByRole("button", { name: /switch environment: production/i }));
+    expect(onEnvClick).toHaveBeenCalledOnce();
+    expect(onTenantClick).not.toHaveBeenCalled();
+  });
+
+  it("single combined button when onEnvClick is omitted (backwards-compat)", () => {
+    const onTenantClick = vi.fn();
+    renderDrawer({ onTenantClick });
+    const btn = screen.getByRole("button", { name: /switch tenant: acme \/ production/i });
+    fireEvent.click(btn);
+    expect(onTenantClick).toHaveBeenCalledOnce();
+  });
+});
+
+// ---------------------------------------------------------------------------
 // logoSlot — user feedback 2026-05-19
 // ---------------------------------------------------------------------------
 

@@ -45,6 +45,11 @@ export interface MobileDrawerProps {
   onClose: () => void;
   onItemClick?: (item: MobileNavItem) => void;
   onTenantClick?: () => void;
+  /**
+   * When provided, the tenant chip is split into two buttons (tenant / env).
+   * Clicking the right zone fires onEnvClick. Omit for single-click backwards-compat.
+   */
+  onEnvClick?: () => void;
   onUserSettingsClick?: () => void;
   /**
    * Real logo slot — user feedback 2026-05-19. When provided, the gradient
@@ -70,6 +75,7 @@ export function MobileDrawer({
   onClose,
   onItemClick,
   onTenantClick,
+  onEnvClick,
   onUserSettingsClick,
   logoSlot,
 }: MobileDrawerProps): JSX.Element {
@@ -195,34 +201,92 @@ export function MobileDrawer({
           )}
         </Box>
 
-        {/* Tenant chip */}
+        {/* Tenant chip — split into two zones when onEnvClick is provided. */}
         <Box sx={{ padding: "0 12px 10px" }}>
-          <ButtonBase
-            onClick={onTenantClick}
-            aria-label={`Switch tenant: ${tenant} / ${env}`}
-            sx={{
-              width: "100%",
-              display: "flex",
-              alignItems: "center",
-              gap: "8px",
-              padding: "9px 12px",
-              background: isDark ? "rgba(255,255,255,0.04)" : "#FAFBFC",
-              border: `1px solid ${border}`,
-              borderRadius: "8px",
-              cursor: "pointer",
-              fontFamily: "'Inter', system-ui, sans-serif",
-              fontSize: 13,
-              color: ink,
-              fontWeight: 500,
-              textAlign: "left",
-            }}
-          >
-            <Box component="span" aria-hidden="true" sx={{ width: 6, height: 6, borderRadius: "50%", background: cyan, flexShrink: 0 }} />
-            <Box component="span" sx={{ color: ink, fontWeight: 500 }}>{tenant}</Box>
-            <Box component="span" sx={{ color: ink3, fontWeight: 400 }}>{" "}/{" "}{env}</Box>
-            <Box component="span" sx={{ flex: 1 }} />
-            <UnfoldMoreIcon sx={{ fontSize: 14, color: ink3 }} />
-          </ButtonBase>
+          {onEnvClick ? (
+            <Box
+              sx={{
+                display: "flex",
+                background: isDark ? "rgba(255,255,255,0.04)" : "#FAFBFC",
+                border: `1px solid ${border}`,
+                borderRadius: "8px",
+                overflow: "hidden",
+              }}
+            >
+              {/* Left zone — tenant */}
+              <ButtonBase
+                onClick={onTenantClick}
+                aria-label={`Switch tenant: ${tenant}`}
+                sx={{
+                  flex: 1,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  padding: "9px 8px 9px 12px",
+                  cursor: "pointer",
+                  fontFamily: "'Inter', system-ui, sans-serif",
+                  fontSize: 13,
+                  color: ink,
+                  fontWeight: 500,
+                  textAlign: "left",
+                  borderRight: `1px solid ${border}`,
+                  "&:hover": { background: isDark ? "rgba(255,255,255,0.06)" : "#F1F5F9" },
+                }}
+              >
+                <Box component="span" sx={{ color: ink, fontWeight: 500, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                  {tenant}
+                </Box>
+                <UnfoldMoreIcon sx={{ fontSize: 14, color: ink3, flexShrink: 0 }} />
+              </ButtonBase>
+              {/* Right zone — env */}
+              <ButtonBase
+                onClick={onEnvClick}
+                aria-label={`Switch environment: ${env}`}
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  padding: "9px 12px",
+                  cursor: "pointer",
+                  fontFamily: "'Inter', system-ui, sans-serif",
+                  fontSize: 13,
+                  color: ink3,
+                  fontWeight: 400,
+                  "&:hover": { background: isDark ? "rgba(255,255,255,0.06)" : "#F1F5F9" },
+                }}
+              >
+                <Box component="span" aria-hidden="true" sx={{ width: 6, height: 6, borderRadius: "50%", background: cyan, flexShrink: 0 }} />
+                <Box component="span">{env}</Box>
+              </ButtonBase>
+            </Box>
+          ) : (
+            <ButtonBase
+              onClick={onTenantClick}
+              aria-label={`Switch tenant: ${tenant} / ${env}`}
+              sx={{
+                width: "100%",
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+                padding: "9px 12px",
+                background: isDark ? "rgba(255,255,255,0.04)" : "#FAFBFC",
+                border: `1px solid ${border}`,
+                borderRadius: "8px",
+                cursor: "pointer",
+                fontFamily: "'Inter', system-ui, sans-serif",
+                fontSize: 13,
+                color: ink,
+                fontWeight: 500,
+                textAlign: "left",
+              }}
+            >
+              <Box component="span" aria-hidden="true" sx={{ width: 6, height: 6, borderRadius: "50%", background: cyan, flexShrink: 0 }} />
+              <Box component="span" sx={{ color: ink, fontWeight: 500 }}>{tenant}</Box>
+              <Box component="span" sx={{ color: ink3, fontWeight: 400 }}>{" "}/{" "}{env}</Box>
+              <Box component="span" sx={{ flex: 1 }} />
+              <UnfoldMoreIcon sx={{ fontSize: 14, color: ink3 }} />
+            </ButtonBase>
+          )}
         </Box>
 
         {/* Search */}
