@@ -68,6 +68,13 @@ export function WorkflowPage({
   });
 
   const containerRef = useRef<HTMLDivElement>(null);
+  // tocNavRef points at the scrollable TOC pill strip. The auto-track
+  // effect below uses it to scroll the active pill into view when the
+  // page-scroll-spy lands on a section whose pill is off the visible
+  // portion of the strip (very common on mobile where only 2-3 pills
+  // fit). Without this, the trailing-edge mask quietly hides the active
+  // pill once the user scrolls past the first sections.
+  const tocNavRef = useRef<HTMLElement>(null);
 
   // On mount: if hash matches an anchor, scroll to it and mark it active.
   useEffect(() => {
@@ -133,6 +140,32 @@ export function WorkflowPage({
     },
     [onTocClick],
   );
+
+  // Auto-track the active pill: whenever `activeAnchor` flips (either
+  // from scroll-spy or from a hash deep-link), scroll the TOC strip
+  // horizontally so the matching pill sits inside the visible portion
+  // (clear of the 32px right-edge fade mask). Without this, the active
+  // pill silently slides under the mask on mobile when the page scrolls
+  // past the first 1-2 sections — the user reported it as "the top menu
+  // not visible on the right after scrolling."
+  useEffect(() => {
+    const nav = tocNavRef.current;
+    if (!nav || !activeAnchor) return;
+    const pill = nav.querySelector<HTMLElement>(`[data-toc-key="${activeAnchor}"]`);
+    if (!pill) return;
+    const navRect = nav.getBoundingClientRect();
+    const pillRect = pill.getBoundingClientRect();
+    // Add a 32px right-edge offset so the active pill clears the fade.
+    const rightFade = 32;
+    if (pillRect.right > navRect.right - rightFade) {
+      // Pill is hidden under the right fade — scroll so it lands at the
+      // right edge minus the fade width.
+      nav.scrollLeft += pillRect.right - (navRect.right - rightFade);
+    } else if (pillRect.left < navRect.left) {
+      // Pill is hidden to the left — scroll back into view.
+      nav.scrollLeft -= navRect.left - pillRect.left;
+    }
+  }, [activeAnchor]);
 
   const stickyBg = isDark ? "rgba(30,41,59,0.94)" : "rgba(255,255,255,0.96)";
   const border = brand?.border ?? "#E2E8F0";
@@ -229,8 +262,12 @@ export function WorkflowPage({
           top: 0,
           background: stickyBg,
           borderBottom: isScrolled ? "none" : `1px solid ${border}`,
-          borderBottomLeftRadius: { xs: 0, sm: "16px" },
-          borderBottomRightRadius: { xs: 0, sm: "16px" },
+          // Round bottom corners on every breakpoint — the mobile screenshot
+          // the user flagged showed brutal square edges where the cards below
+          // round at 12-16px. 12px on mobile (matches mobile card radius), 16px
+          // on sm+ (matches desktop card radius). Both keep the strip card-like.
+          borderBottomLeftRadius: { xs: "12px", sm: "16px" },
+          borderBottomRightRadius: { xs: "12px", sm: "16px" },
           // 32px horizontal gutter on desktop; 16px on mobile (spec §Spacing)
           px: { xs: 2, sm: 4 },
           pt: "18px",
@@ -296,6 +333,7 @@ export function WorkflowPage({
             Mask only kicks in when there's actually overflow — `mask` on a
             box that hasn't overflowed is a no-op visually. */}
         <Box
+          ref={tocNavRef}
           component="nav"
           aria-label="Page sections"
           sx={{
@@ -311,6 +349,11 @@ export function WorkflowPage({
             // Reserve some bottom padding so the fade doesn't clip into the
             // active-pill rounded corner when content underneath scrolls.
             pb: "2px",
+            // smooth scrolling for the active-pill auto-track effect — when
+            // the user scrolls the page and the active section changes, the
+            // TOC pill scrolls itself horizontally so the active one stays
+            // visible rather than disappearing under the trailing-edge fade.
+            scrollBehavior: "smooth",
             // Hide scrollbar visually (spec shows clean pill strip with no visible scrollbar)
             scrollbarWidth: "none",
             "&::-webkit-scrollbar": { display: "none" },
@@ -326,6 +369,7 @@ export function WorkflowPage({
                 component="button"
                 onClick={() => handlePillClick(item.key)}
                 aria-current={isActive ? "true" : undefined}
+                data-toc-key={item.key}
                 sx={{
                   height: 28,
                   px: "10px",
