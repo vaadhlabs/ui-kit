@@ -199,7 +199,7 @@ export function WorkflowPage({
                 fontSize: 26,
                 fontWeight: 600,
                 letterSpacing: "-0.02em",
-                color: brand?.ink ?? "#0F172A",
+                color: brand?.ink ?? theme.palette.text.primary,
                 fontFamily: "'Inter', system-ui, sans-serif",
               }}
             >
@@ -209,7 +209,7 @@ export function WorkflowPage({
               <Box
                 sx={{
                   fontSize: 13,
-                  color: brand?.ink2 ?? "#475569",
+                  color: brand?.ink2 ?? theme.palette.text.secondary,
                   mt: "4px",
                   fontFamily: "'Inter', system-ui, sans-serif",
                 }}
@@ -256,8 +256,8 @@ export function WorkflowPage({
                   height: 28,
                   px: "10px",
                   borderRadius: "6px",
-                  background: isActive ? (brand?.ink ?? "#0F172A") : "transparent",
-                  color: isActive ? (brand?.paper ?? "#FFFFFF") : (brand?.ink2 ?? "#475569"),
+                  background: isActive ? (brand?.ink ?? theme.palette.text.primary) : "transparent",
+                  color: isActive ? (brand?.paper ?? "#FFFFFF") : (brand?.ink2 ?? theme.palette.text.secondary),
                   border: "none",
                   cursor: "pointer",
                   fontFamily: "'Inter', system-ui, sans-serif",
@@ -285,7 +285,7 @@ export function WorkflowPage({
                     sx={{
                       fontSize: "10.5px",
                       fontFamily: brand?.mono ?? "'JetBrains Mono', monospace",
-                      color: isActive ? "rgba(248,250,252,0.6)" : (brand?.ink3 ?? "#94A3B8"),
+                      color: isActive ? "rgba(248,250,252,0.6)" : (brand?.ink3 ?? theme.palette.text.disabled ?? theme.palette.text.secondary),
                     }}
                   >
                     {item.hint}

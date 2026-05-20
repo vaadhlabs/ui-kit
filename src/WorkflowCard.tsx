@@ -146,7 +146,7 @@ export function WorkflowCard({
                 fontSize: 18,
                 fontWeight: 600,
                 letterSpacing: "-0.01em",
-                color: brand?.ink ?? "#0F172A",
+                color: brand?.ink ?? theme.palette.text.primary,
                 fontFamily: "'Inter', system-ui, sans-serif",
               }}
             >
@@ -156,7 +156,7 @@ export function WorkflowCard({
               <Box
                 sx={{
                   fontSize: 12,
-                  color: brand?.ink2 ?? "#475569",
+                  color: brand?.ink2 ?? theme.palette.text.secondary,
                   mt: "2px",
                   fontFamily: "'Inter', system-ui, sans-serif",
                 }}
