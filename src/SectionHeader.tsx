@@ -28,12 +28,19 @@ export interface SectionHeaderProps {
   /** Optional right-aligned action slot for time-window toggles, view
    *  switchers, or a primary CTA. */
   action?: ReactNode;
+  /**
+   * HTML heading element to render for the title. Defaults to "h2".
+   * Pass "h1" on drill-down pages that have no WorkflowPage wrapper
+   * so the document always has exactly one h1 landmark.
+   */
+  headingLevel?: "h1" | "h2" | "h3";
 }
 
 export function SectionHeader({
   title,
   subtitle,
   action,
+  headingLevel = "h2",
 }: SectionHeaderProps): JSX.Element {
   return (
     <Box
@@ -53,6 +60,7 @@ export function SectionHeader({
       <Box sx={{ flex: 1, minWidth: 0 }}>
         <Typography
           variant="h2"
+          component={headingLevel}
           sx={{
             color: "text.primary",
             mb: subtitle ? 0.5 : 0,
