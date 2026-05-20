@@ -39,7 +39,10 @@ export function MetricCard({ title, value, icon, color = "primary", subtitle }: 
                 textTransform: "uppercase",
                 letterSpacing: "0.06em",
                 fontWeight: 600,
-                color: "text.disabled",
+                // text.secondary, not text.disabled — the kicker label is
+                // legitimate content. workshop dark sets disabled to
+                // #586675 which is unreadable against the #0E1116 page bg.
+                color: "text.secondary",
                 fontSize: "0.625rem",
                 lineHeight: 1,
               }}
@@ -60,7 +63,7 @@ export function MetricCard({ title, value, icon, color = "primary", subtitle }: 
               {value}
             </Typography>
             {subtitle && (
-              <Typography variant="body2" sx={{ mt: 0.5, color: "text.disabled", fontSize: "0.6875rem" }}>
+              <Typography variant="body2" sx={{ mt: 0.5, color: "text.secondary", fontSize: "0.6875rem" }}>
                 {subtitle}
               </Typography>
             )}

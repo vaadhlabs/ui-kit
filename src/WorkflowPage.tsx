@@ -285,7 +285,14 @@ export function WorkflowPage({
                     sx={{
                       fontSize: "10.5px",
                       fontFamily: brand?.mono ?? "'JetBrains Mono', monospace",
-                      color: isActive ? "rgba(248,250,252,0.6)" : (brand?.ink3 ?? theme.palette.text.disabled ?? theme.palette.text.secondary),
+                      // brand?.ink3 is the design-system "tertiary ink" for
+                      // hint text. When the host theme is workshop (no brand
+                      // tokens) we fall straight to text.secondary, NOT
+                      // text.disabled — workshop dark sets disabled to
+                      // #586675 which is unreadable against the #0E1116
+                      // page bg, and the hint is legitimate content, not
+                      // a greyed-out affordance.
+                      color: isActive ? "rgba(248,250,252,0.6)" : (brand?.ink3 ?? theme.palette.text.secondary),
                     }}
                   >
                     {item.hint}
