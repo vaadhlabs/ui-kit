@@ -157,34 +157,17 @@ export function MobileTopBar({
         </IconButton>
       </Box>
 
-      {/* Page title strip */}
-      <Box sx={{ padding: "2px 18px 12px" }}>
-        <Box
-          component="h1"
-          sx={{
-            margin: 0,
-            fontSize: 26,
-            fontWeight: 700,
-            letterSpacing: "-0.02em",
-            color: ink,
-            fontFamily: "'Inter', system-ui, sans-serif",
-          }}
-        >
-          {title}
-        </Box>
-        {subtitle && (
-          <Box
-            sx={{
-              fontSize: 12,
-              color: ink2,
-              mt: "2px",
-              fontFamily: "'Inter', system-ui, sans-serif",
-            }}
-          >
-            {subtitle}
-          </Box>
-        )}
-      </Box>
+      {/*
+        The page-title strip used to render here as a second <h1>+subtitle
+        below the top bar row. WorkflowPage already owns the page header
+        (title + subtitle + sticky TOC), so this strip produced TWO stacked
+        headers on mobile: one from MobileTopBar (no TOC, no scroll-spy) and
+        one from WorkflowPage (the real one). Dropped the strip; MobileTopBar
+        is now just the hamburger + brand + alerts bell on a 56px row, and
+        WorkflowPage's own sticky header sits directly below it.
+        `title` and `subtitle` props are kept on the API for backwards-compat
+        in callers + tests, but no longer rendered here.
+      */}
     </Box>
   );
 }

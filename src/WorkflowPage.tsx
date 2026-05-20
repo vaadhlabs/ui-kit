@@ -143,13 +143,17 @@ export function WorkflowPage({
       component="main"
       sx={{
         flex: 1,
-        // On mobile (xs), the shell's outer <main> is the scroll container.
-        // WorkflowPage must NOT establish its own scroll root there — doing so
-        // causes `height: "100%"` to resolve to 0 inside the flex layout,
-        // rendering a blank content area. On md+ the rail layout gives
-        // WorkflowPage a definite height so it can own its scroll.
-        height: { xs: "auto", md: "100%" },
-        overflowY: { xs: "visible", md: "auto" },
+        // The shell's outer <main> is the single scroll container for the
+        // app on both mobile AND desktop. WorkflowPage MUST NOT establish
+        // its own nested scroll context — when it did (height:100% +
+        // overflowY:auto on md+), the sticky page header below stuck to
+        // WorkflowPage's own scroll context rather than to the viewport,
+        // which scrolled away with the document. User-visible symptom:
+        // "the top menu strip isn't sticky anymore on desktop." Fix is to
+        // make WorkflowPage a plain block — sticky `top: 0` then resolves
+        // against the shell's main, exactly like MobileTopBar does.
+        height: "auto",
+        overflowY: "visible",
         // PAGE surface (not card surface). Per the design spec §Design tokens:
         // bgPage = page background (#FAFBFC light / #0F172A dark);
         // paper  = card + sidebar surface (#FFFFFF light / #1E293B dark).
@@ -256,8 +260,15 @@ export function WorkflowPage({
                   height: 28,
                   px: "10px",
                   borderRadius: "6px",
+                  // Active-pill bg in workshop theme resolves to text.primary
+                  // — that's #E6EDF3 (near-white) in dark mode and #1A1A1A
+                  // (near-black) in light mode. The text colour has to invert
+                  // against that, NOT fall back to a hard-coded white that
+                  // disappears against the dark-mode active bg.
                   background: isActive ? (brand?.ink ?? theme.palette.text.primary) : "transparent",
-                  color: isActive ? (brand?.paper ?? "#FFFFFF") : (brand?.ink2 ?? theme.palette.text.secondary),
+                  color: isActive
+                    ? (brand?.paper ?? theme.palette.background.default ?? "#FFFFFF")
+                    : (brand?.ink2 ?? theme.palette.text.secondary),
                   border: "none",
                   cursor: "pointer",
                   fontFamily: "'Inter', system-ui, sans-serif",
@@ -285,14 +296,18 @@ export function WorkflowPage({
                     sx={{
                       fontSize: "10.5px",
                       fontFamily: brand?.mono ?? "'JetBrains Mono', monospace",
-                      // brand?.ink3 is the design-system "tertiary ink" for
-                      // hint text. When the host theme is workshop (no brand
-                      // tokens) we fall straight to text.secondary, NOT
-                      // text.disabled — workshop dark sets disabled to
-                      // #586675 which is unreadable against the #0E1116
-                      // page bg, and the hint is legitimate content, not
-                      // a greyed-out affordance.
-                      color: isActive ? "rgba(248,250,252,0.6)" : (brand?.ink3 ?? theme.palette.text.secondary),
+                      // Active-state hint paints AGAINST the active pill bg
+                      // (text.primary, see above). Use background.default at
+                      // 70% alpha so the hint inverts cleanly in both modes
+                      // — light-on-dark in light theme, dark-on-light in
+                      // dark theme. The previous hard-coded 60%-white only
+                      // worked in light mode and disappeared against the
+                      // dark-mode active bg.
+                      // Inactive-state hint stays on the page bg, where
+                      // text.secondary reads as expected.
+                      color: isActive
+                        ? `color-mix(in srgb, ${theme.palette.background.default} 80%, transparent)`
+                        : (brand?.ink3 ?? theme.palette.text.secondary),
                     }}
                   >
                     {item.hint}

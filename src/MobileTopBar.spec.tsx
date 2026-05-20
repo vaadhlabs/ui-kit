@@ -11,28 +11,25 @@ function Wrapper({ children, mode = "light" }: { children: React.ReactNode; mode
 }
 
 describe("MobileTopBar", () => {
-  it("renders the page title", () => {
+  // NOTE — title + subtitle are accepted on the API for back-compat with
+  // callers (shell still passes them) but are NOT rendered. WorkflowPage
+  // owns the page header; rendering them here too produced two stacked
+  // headers on mobile. See the comment in MobileTopBar.tsx where the
+  // title strip used to live. Tests below assert the NEW contract.
+  it("does NOT render a page-title h1 (WorkflowPage owns the title now)", () => {
     render(
       <Wrapper>
         <MobileTopBar title="Cost ops" alertsCount={0} onMenu={vi.fn()} />
       </Wrapper>,
     );
-    expect(screen.getByRole("heading", { level: 1, name: "Cost ops" })).toBeInTheDocument();
+    expect(screen.queryByRole("heading", { level: 1 })).not.toBeInTheDocument();
+    expect(screen.queryByText("Cost ops")).not.toBeInTheDocument();
   });
 
-  it("renders subtitle when provided", () => {
+  it("does not render subtitle text — props kept for API back-compat only", () => {
     render(
       <Wrapper>
         <MobileTopBar title="Cost ops" subtitle="$55k · 30d" alertsCount={0} onMenu={vi.fn()} />
-      </Wrapper>,
-    );
-    expect(screen.getByText("$55k · 30d")).toBeInTheDocument();
-  });
-
-  it("does not render subtitle when omitted", () => {
-    render(
-      <Wrapper>
-        <MobileTopBar title="Alerts" alertsCount={3} onMenu={vi.fn()} />
       </Wrapper>,
     );
     expect(screen.queryByText("$55k · 30d")).not.toBeInTheDocument();
@@ -106,7 +103,8 @@ describe("MobileTopBar", () => {
         <MobileTopBar title="GPU fleet" alertsCount={1} onMenu={vi.fn()} />
       </Wrapper>,
     );
-    expect(screen.getByRole("heading", { level: 1 })).toBeInTheDocument();
+    // No h1 — WorkflowPage owns the title. Smoke-test the hamburger is still here.
+    expect(screen.getByRole("button", { name: /open navigation/i })).toBeInTheDocument();
   });
 });
 
