@@ -143,8 +143,13 @@ export function WorkflowPage({
       component="main"
       sx={{
         flex: 1,
-        height: "100%",
-        overflowY: "auto",
+        // On mobile (xs), the shell's outer <main> is the scroll container.
+        // WorkflowPage must NOT establish its own scroll root there — doing so
+        // causes `height: "100%"` to resolve to 0 inside the flex layout,
+        // rendering a blank content area. On md+ the rail layout gives
+        // WorkflowPage a definite height so it can own its scroll.
+        height: { xs: "auto", md: "100%" },
+        overflowY: { xs: "visible", md: "auto" },
         // PAGE surface (not card surface). Per the design spec §Design tokens:
         // bgPage = page background (#FAFBFC light / #0F172A dark);
         // paper  = card + sidebar surface (#FFFFFF light / #1E293B dark).

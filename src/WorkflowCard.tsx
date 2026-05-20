@@ -107,7 +107,12 @@ export function WorkflowCard({
         onMouseMove={handleInteraction}
         onKeyDown={handleInteraction}
         sx={{
-          background: brand?.paper ?? "#FFFFFF",
+          // brand.paper resolves to the correct card surface per mode:
+          //   light: #FFFFFF, dark: #1E293B
+          // Fallback to theme.palette.background.paper so MFs that use
+          // createWorkshopTheme (which has no brand tokens) also get
+          // the right dark-mode surface instead of the hardcoded white.
+          background: brand?.paper ?? theme.palette.background.paper,
           border: `1px solid ${borderColor}`,
           borderRadius: brand?.radiusXl ?? "12px",
           padding: "22px",
