@@ -288,8 +288,13 @@ export function WorkflowPage({
           )}
         </Box>
 
-        {/* TOC pill row — horizontal scroll on narrow screens per spec §Mobile layout rules.
-            Pills never wrap to a second line; the strip scrolls instead. */}
+        {/* TOC pill row — horizontal scroll when pills overflow the page width.
+            Pills never wrap to a second line; the strip scrolls instead.
+            B30: previously the last pill clipped at the right edge with no
+            visual cue that more content was hidden. Added a mask-image fade
+            on the right so a designer's eye reads "there's more, scroll".
+            Mask only kicks in when there's actually overflow — `mask` on a
+            box that hasn't overflowed is a no-op visually. */}
         <Box
           component="nav"
           aria-label="Page sections"
@@ -298,6 +303,14 @@ export function WorkflowPage({
             gap: "2px",
             mt: "14px",
             overflowX: "auto",
+            // Soft fade on the trailing edge cues "more sections — scroll
+            // right". The mask is 32px wide; the rest of the strip is fully
+            // opaque. webkit-mask-image included for Safari compatibility.
+            maskImage: "linear-gradient(to right, black 0, black calc(100% - 32px), transparent 100%)",
+            WebkitMaskImage: "linear-gradient(to right, black 0, black calc(100% - 32px), transparent 100%)",
+            // Reserve some bottom padding so the fade doesn't clip into the
+            // active-pill rounded corner when content underneath scrolls.
+            pb: "2px",
             // Hide scrollbar visually (spec shows clean pill strip with no visible scrollbar)
             scrollbarWidth: "none",
             "&::-webkit-scrollbar": { display: "none" },
