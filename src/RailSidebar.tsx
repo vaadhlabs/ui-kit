@@ -90,6 +90,13 @@ export interface RailSidebarProps {
   alertsCount: number;
   onSearch?: () => void;
   onTenantClick?: () => void;
+  /**
+   * When provided, the tenant chip is split into two clickable zones:
+   * - left zone (tenant name): fires onTenantClick
+   * - right zone (env name): fires onEnvClick
+   * When omitted, the whole chip fires onTenantClick (backwards-compat).
+   */
+  onEnvClick?: () => void;
   onUserSettingsClick?: () => void;
   /** Called when a nav item is clicked. Host handles actual navigation. */
   onItemClick?: (item: NavItem) => void;
@@ -134,6 +141,7 @@ export function RailSidebar({
   alertsCount,
   onSearch,
   onTenantClick,
+  onEnvClick,
   onUserSettingsClick,
   onItemClick,
   defaultCollapsed = true,
@@ -365,7 +373,11 @@ export function RailSidebar({
         )}
       </Box>
 
-      {/* Zone 2 — Tenant chip (hidden in collapsed mode) */}
+      {/* Zone 2 — Tenant chip (hidden in collapsed mode).
+          When onEnvClick is provided the chip is split into two adjacent
+          buttons so tenant-switch and env-switch are independently reachable.
+          When onEnvClick is absent the whole chip fires onTenantClick
+          (single-tenant backwards-compat). */}
       <Box
         sx={{
           padding: "0 12px 10px",
@@ -376,49 +388,105 @@ export function RailSidebar({
           flexShrink: 0,
         }}
       >
-        <ButtonBase
-          onClick={onTenantClick}
-          aria-label={`Switch tenant: ${tenant} / ${env}`}
-          tabIndex={isExpanded ? 0 : -1}
-          sx={{
-            appearance: "none",
-            width: "100%",
-            display: "flex",
-            alignItems: "center",
-            gap: "8px",
-            padding: "7px 10px",
-            background: paper,
-            border: `1px solid ${border}`,
-            borderRadius: "8px",
-            cursor: "pointer",
-            fontFamily: "'Inter', system-ui, sans-serif",
-            fontSize: 12.5,
-            color: ink,
-            fontWeight: 500,
-            textAlign: "left",
-          }}
-        >
-          {/* Cyan env dot */}
+        {onEnvClick ? (
+          /* Split mode — two buttons side by side inside a shared border frame */
           <Box
-            component="span"
-            aria-hidden="true"
             sx={{
-              width: 6,
-              height: 6,
-              borderRadius: "50%",
-              background: cyan,
-              flexShrink: 0,
+              display: "flex",
+              background: paper,
+              border: `1px solid ${border}`,
+              borderRadius: "8px",
+              overflow: "hidden",
             }}
-          />
-          <Box component="span" sx={{ color: ink, fontWeight: 500 }}>
-            {tenant}
+          >
+            {/* Left zone — tenant name */}
+            <ButtonBase
+              onClick={onTenantClick}
+              aria-label={`Switch tenant: ${tenant}`}
+              tabIndex={isExpanded ? 0 : -1}
+              sx={{
+                flex: 1,
+                display: "flex",
+                alignItems: "center",
+                gap: "6px",
+                padding: "7px 8px 7px 10px",
+                cursor: "pointer",
+                fontFamily: "'Inter', system-ui, sans-serif",
+                fontSize: 12.5,
+                color: ink,
+                fontWeight: 500,
+                textAlign: "left",
+                borderRight: `1px solid ${border}`,
+                "&:hover": { background: isDark ? "rgba(255,255,255,0.04)" : "#F8FAFC" },
+              }}
+            >
+              <Box component="span" sx={{ color: ink, fontWeight: 500, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                {tenant}
+              </Box>
+              <UnfoldMoreIcon sx={{ fontSize: 13, color: ink3, flexShrink: 0 }} />
+            </ButtonBase>
+            {/* Right zone — env name */}
+            <ButtonBase
+              onClick={onEnvClick}
+              aria-label={`Switch environment: ${env}`}
+              tabIndex={isExpanded ? 0 : -1}
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: "5px",
+                padding: "7px 8px",
+                cursor: "pointer",
+                fontFamily: "'Inter', system-ui, sans-serif",
+                fontSize: 12,
+                color: ink3,
+                fontWeight: 400,
+                "&:hover": { background: isDark ? "rgba(255,255,255,0.04)" : "#F8FAFC" },
+              }}
+            >
+              {/* Cyan env dot */}
+              <Box
+                component="span"
+                aria-hidden="true"
+                sx={{ width: 6, height: 6, borderRadius: "50%", background: cyan, flexShrink: 0 }}
+              />
+              <Box component="span">{env}</Box>
+            </ButtonBase>
           </Box>
-          <Box component="span" sx={{ color: ink3, fontWeight: 400 }}>
-            {" "}/{" "}{env}
-          </Box>
-          <Box component="span" sx={{ flex: 1 }} />
-          <UnfoldMoreIcon sx={{ fontSize: 14, color: ink3, flexShrink: 0 }} />
-        </ButtonBase>
+        ) : (
+          /* Single-button mode (no onEnvClick) — backwards-compat */
+          <ButtonBase
+            onClick={onTenantClick}
+            aria-label={`Switch tenant: ${tenant} / ${env}`}
+            tabIndex={isExpanded ? 0 : -1}
+            sx={{
+              appearance: "none",
+              width: "100%",
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              padding: "7px 10px",
+              background: paper,
+              border: `1px solid ${border}`,
+              borderRadius: "8px",
+              cursor: "pointer",
+              fontFamily: "'Inter', system-ui, sans-serif",
+              fontSize: 12.5,
+              color: ink,
+              fontWeight: 500,
+              textAlign: "left",
+            }}
+          >
+            <Box
+              component="span"
+              aria-hidden="true"
+              sx={{ width: 6, height: 6, borderRadius: "50%", background: cyan, flexShrink: 0 }}
+            />
+            <Box component="span" sx={{ color: ink, fontWeight: 500 }}>{tenant}</Box>
+            <Box component="span" sx={{ color: ink3, fontWeight: 400 }}>{" "}/{" "}{env}</Box>
+            <Box component="span" sx={{ flex: 1 }} />
+            <UnfoldMoreIcon sx={{ fontSize: 14, color: ink3, flexShrink: 0 }} />
+          </ButtonBase>
+        )}
       </Box>
 
       {/* Zone 3 — Search input (hidden in collapsed mode) */}

@@ -364,6 +364,48 @@ describe("RailSidebar — collapsed-mode tooltips", () => {
 });
 
 // ---------------------------------------------------------------------------
+// onEnvClick — split tenant chip
+// ---------------------------------------------------------------------------
+
+describe("RailSidebar — onEnvClick (split chip)", () => {
+  it("renders two separate buttons when onEnvClick is provided", () => {
+    const onTenantClick = vi.fn();
+    const onEnvClick = vi.fn();
+    renderSidebar({ defaultCollapsed: false, onTenantClick, onEnvClick });
+    expect(screen.getByRole("button", { name: /switch tenant: acme/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /switch environment: production/i })).toBeInTheDocument();
+  });
+
+  it("left zone fires onTenantClick", () => {
+    const onTenantClick = vi.fn();
+    const onEnvClick = vi.fn();
+    renderSidebar({ defaultCollapsed: false, onTenantClick, onEnvClick });
+    fireEvent.click(screen.getByRole("button", { name: /switch tenant: acme/i }));
+    expect(onTenantClick).toHaveBeenCalledOnce();
+    expect(onEnvClick).not.toHaveBeenCalled();
+  });
+
+  it("right zone fires onEnvClick", () => {
+    const onTenantClick = vi.fn();
+    const onEnvClick = vi.fn();
+    renderSidebar({ defaultCollapsed: false, onTenantClick, onEnvClick });
+    fireEvent.click(screen.getByRole("button", { name: /switch environment: production/i }));
+    expect(onEnvClick).toHaveBeenCalledOnce();
+    expect(onTenantClick).not.toHaveBeenCalled();
+  });
+
+  it("single combined button when onEnvClick is omitted (backwards-compat)", () => {
+    const onTenantClick = vi.fn();
+    renderSidebar({ defaultCollapsed: false, onTenantClick });
+    // Combined chip has the old aria-label format: "Switch tenant: acme / production"
+    const btn = screen.getByRole("button", { name: /switch tenant: acme \/ production/i });
+    expect(btn).toBeInTheDocument();
+    fireEvent.click(btn);
+    expect(onTenantClick).toHaveBeenCalledOnce();
+  });
+});
+
+// ---------------------------------------------------------------------------
 // logoSlot — user feedback 2026-05-19
 // ---------------------------------------------------------------------------
 
