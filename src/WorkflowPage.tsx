@@ -145,9 +145,21 @@ export function WorkflowPage({
         flex: 1,
         height: "100%",
         overflowY: "auto",
-        background: brand?.paper ?? "#FFFFFF",
+        // PAGE surface (not card surface). Per the design spec §Design tokens:
+        // bgPage = page background (#FAFBFC light / #0F172A dark);
+        // paper  = card + sidebar surface (#FFFFFF light / #1E293B dark).
+        // Cards inside this Box use `paper`, so the page underneath uses
+        // `bgPage` — that's what makes cards visually float in dark mode
+        // (slate-800 cards on a slate-900 page) and gives the subtle lift
+        // on light mode (#FFFFFF cards on #FAFBFC page). The pre-fix code
+        // used `paper` here too, which collapsed the distinction AND showed
+        // bright white in dark mode when the brand token didn't resolve.
+        //
+        // Fallback chain: brand.bgPage (spec value) → theme palette default
+        // (always present via createTensorTheme) → light off-white literal.
+        background: brand?.bgPage ?? theme.palette.background.default ?? "#FAFBFC",
         fontFamily: "'Inter', system-ui, sans-serif",
-        color: brand?.ink ?? "#0F172A",
+        color: brand?.ink ?? theme.palette.text.primary ?? "#0F172A",
       }}
     >
       {/* Sticky page header */}
