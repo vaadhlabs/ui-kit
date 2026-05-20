@@ -290,7 +290,17 @@ export function WorkflowPage({
           display: "flex",
           flexDirection: "column",
           gap: "16px",
-          maxWidth: 1080,
+          // Responsive cap. The spec said 1080px; on a 2000px display with
+          // the rail collapsed to 56px that left ~600px of asymmetric
+          // whitespace to the right of the content. Use a breakpoint-driven
+          // ladder so content fills more horizontal space as the viewport
+          // grows, while preserving readable line lengths on medium screens.
+          maxWidth: { xs: "100%", md: 1200, lg: 1440, xl: 1680 },
+          width: "100%",
+          // Center content within the main area so when the rail toggles
+          // between 240px and 56px, content stays optically balanced
+          // instead of left-anchored with growing right-side whitespace.
+          mx: "auto",
         }}
       >
         {children}
