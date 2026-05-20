@@ -157,19 +157,24 @@ export function WorkflowPage({
           top: 0,
           background: stickyBg,
           borderBottom: `1px solid ${border}`,
-          padding: "18px 32px 14px",
+          // 32px horizontal gutter on desktop; 16px on mobile (spec §Spacing)
+          px: { xs: 2, sm: 4 },
+          pt: "18px",
+          pb: "14px",
           zIndex: 10,
         }}
       >
-        {/* Title row */}
+        {/* Title row — wraps action slot below title on narrow screens */}
         <Box
           sx={{
             display: "flex",
             alignItems: "flex-end",
             justifyContent: "space-between",
+            flexWrap: "wrap",
+            gap: "8px",
           }}
         >
-          <Box>
+          <Box sx={{ flex: 1, minWidth: 0 }}>
             <Box
               component="h1"
               sx={{
@@ -197,11 +202,16 @@ export function WorkflowPage({
             )}
           </Box>
           {actionSlot && (
-            <Box sx={{ display: "flex", gap: "8px" }}>{actionSlot}</Box>
+            // On mobile the action slot becomes a full-width row below the title.
+            // On sm+ it stays right-aligned beside the title.
+            <Box sx={{ display: "flex", gap: "8px", width: { xs: "100%", sm: "auto" } }}>
+              {actionSlot}
+            </Box>
           )}
         </Box>
 
-        {/* TOC pill row */}
+        {/* TOC pill row — horizontal scroll on narrow screens per spec §Mobile layout rules.
+            Pills never wrap to a second line; the strip scrolls instead. */}
         <Box
           component="nav"
           aria-label="Page sections"
@@ -209,7 +219,12 @@ export function WorkflowPage({
             display: "flex",
             gap: "2px",
             mt: "14px",
-            flexWrap: "wrap",
+            overflowX: "auto",
+            // Hide scrollbar visually (spec shows clean pill strip with no visible scrollbar)
+            scrollbarWidth: "none",
+            "&::-webkit-scrollbar": { display: "none" },
+            // iOS momentum scroll
+            WebkitOverflowScrolling: "touch",
           }}
         >
           {tocItems.map((item) => {
@@ -234,6 +249,10 @@ export function WorkflowPage({
                   display: "inline-flex",
                   alignItems: "center",
                   gap: "6px",
+                  // Prevent pills from shrinking inside the scroll container — each
+                  // pill keeps its natural width so the row scrolls rather than squishing.
+                  flexShrink: 0,
+                  whiteSpace: "nowrap",
                   // No position animation — just color swap per spec §Interactions
                   transition: `background ${brand?.motionFast ?? "150ms cubic-bezier(0.4,0,0.2,1)"}, color ${brand?.motionFast ?? "150ms"}`,
                   "&:focus-visible": {
@@ -264,7 +283,10 @@ export function WorkflowPage({
       {/* Scrollable content — WorkflowCard children */}
       <Box
         sx={{
-          padding: "20px 32px 40px",
+          // 32px horizontal gutter on desktop; 16px on mobile (spec §Spacing)
+          px: { xs: 2, sm: 4 },
+          pt: "20px",
+          pb: "40px",
           display: "flex",
           flexDirection: "column",
           gap: "16px",
