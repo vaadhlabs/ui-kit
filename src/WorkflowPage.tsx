@@ -137,6 +137,41 @@ export function WorkflowPage({
   const stickyBg = isDark ? "rgba(30,41,59,0.94)" : "rgba(255,255,255,0.96)";
   const border = brand?.border ?? "#E2E8F0";
 
+  // Scroll-state — flips the moment the sentinel above the sticky header
+  // crosses out of view. Used to elevate the sticky header (rounded bottom
+  // corners + soft shadow) so the content visibly slides under it instead
+  // of butting up against a hairline border. At-rest the header has no
+  // shadow so the page reads as one calm composition; only when the user
+  // is actively scrolling does the elevation cue kick in.
+  const sentinelRef = useRef<HTMLDivElement>(null);
+  const [isScrolled, setIsScrolled] = useState(false);
+  useEffect(() => {
+    if (typeof IntersectionObserver === "undefined") return;
+    const sentinel = sentinelRef.current;
+    if (!sentinel) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        if (!entry) return;
+        setIsScrolled(!entry.isIntersecting);
+      },
+      // root: null = viewport. threshold 1.0 = fire when fully in/out of view.
+      { threshold: 1.0 },
+    );
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, []);
+
+  // Shadow intensity gracefully responds to theme — softer/larger in dark
+  // (matches the lower contrast of slate-900 cards on slate-800 page) and
+  // tighter/sharper in light. Both stay below the "elevation overload"
+  // threshold (material spec calls this an elevation-2 surface).
+  const stickyShadow = isScrolled
+    ? isDark
+      ? "0 6px 18px -6px rgba(0,0,0,0.55), 0 1px 0 0 rgba(255,255,255,0.04)"
+      : "0 6px 16px -8px rgba(15,23,42,0.18), 0 1px 0 0 rgba(15,23,42,0.04)"
+    : "none";
+
   return (
     <Box
       ref={containerRef}
@@ -171,18 +206,40 @@ export function WorkflowPage({
         color: brand?.ink ?? theme.palette.text.primary ?? "#0F172A",
       }}
     >
-      {/* Sticky page header */}
+      {/* Scroll sentinel — invisible 1px tracer the IntersectionObserver
+          above uses to detect when the user has scrolled past the page top.
+          Lives outside the sticky header so the header's own sticky behaviour
+          doesn't confuse the observer. */}
+      <Box ref={sentinelRef} aria-hidden="true" sx={{ height: "1px", width: "100%" }} />
+
+      {/* Sticky page header.
+          - Rounded bottom corners (16px on sm+, square on xs since the
+            mobile breakpoint butts the header to the screen edge anyway)
+            give the strip an elegant card-like silhouette instead of a
+            hard rectangle.
+          - At rest: no shadow, just the page-tone background — reads as
+            part of the page chrome.
+          - On scroll: a soft shadow elevates the strip and the content
+            below visibly slides UNDER it. Border-bottom is dropped while
+            scrolled so the shadow does the visual work (a 1px hairline +
+            shadow reads as two competing edges). */}
       <Box
         sx={{
           position: "sticky",
           top: 0,
           background: stickyBg,
-          borderBottom: `1px solid ${border}`,
+          borderBottom: isScrolled ? "none" : `1px solid ${border}`,
+          borderBottomLeftRadius: { xs: 0, sm: "16px" },
+          borderBottomRightRadius: { xs: 0, sm: "16px" },
           // 32px horizontal gutter on desktop; 16px on mobile (spec §Spacing)
           px: { xs: 2, sm: 4 },
           pt: "18px",
           pb: "14px",
           zIndex: 10,
+          boxShadow: stickyShadow,
+          // Match the timing of the active-pill colour-swap so the elevation
+          // cue feels coherent with the rest of the page's micro-motion.
+          transition: `box-shadow ${brand?.motionFast ?? "200ms cubic-bezier(0.4,0,0.2,1)"}, border-color 200ms`,
         }}
       >
         {/* Title row — wraps action slot below title on narrow screens */}

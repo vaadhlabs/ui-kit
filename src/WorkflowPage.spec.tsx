@@ -156,12 +156,16 @@ describe("WorkflowPage", () => {
   });
 
   it("IntersectionObserver is set up for each anchor", () => {
-    // Capture the IntersectionObserver callback so we can invoke it directly.
-    let capturedCallback: ((entries: IntersectionObserverEntry[]) => void) | null = null;
+    // WorkflowPage now constructs TWO IntersectionObservers — one for the
+    // scroll-spy (anchor tracking) and one for the scroll-shadow sentinel.
+    // Capture each callback in order via the mock impl: first call = scroll
+    // spy (declared earlier in the component), second call = sentinel.
+    const callbacks: Array<(entries: IntersectionObserverEntry[]) => void> = [];
     (IntersectionObserver as ReturnType<typeof vi.fn>).mockImplementation((cb: (e: IntersectionObserverEntry[]) => void) => {
-      capturedCallback = cb;
+      callbacks.push(cb);
       return { observe: vi.fn(), disconnect: vi.fn(), unobserve: vi.fn() };
     });
+    const scrollSpyCallback = (): ((entries: IntersectionObserverEntry[]) => void) | null => callbacks[0] ?? null;
 
     // Inject anchor elements for the IO to observe
     const anchors = TOC.map(({ key }) => {
@@ -172,10 +176,12 @@ describe("WorkflowPage", () => {
     });
 
     renderPage();
+    // First-constructed observer = the scroll-spy that watches anchors.
     const ioInstance = (IntersectionObserver as ReturnType<typeof vi.fn>).mock.results[0]?.value;
     expect(ioInstance?.observe).toHaveBeenCalledTimes(TOC.length);
 
-    // Exercise the IO callback: simulate "sources" becoming visible.
+    // Exercise the scroll-spy IO callback: simulate "sources" becoming visible.
+    const capturedCallback = scrollSpyCallback();
     if (capturedCallback) {
       capturedCallback([
         {
@@ -191,9 +197,13 @@ describe("WorkflowPage", () => {
   });
 
   it("IntersectionObserver callback updates active anchor on visibility change", () => {
-    let capturedCallback: ((entries: IntersectionObserverEntry[]) => void) | null = null;
+    // Two IOs are constructed (scroll-spy + sentinel). Capture each
+    // callback in declaration order so we can address the scroll-spy
+    // one specifically — the sentinel one only flips an `isScrolled`
+    // bool and would not change `aria-current`.
+    const callbacks: Array<(entries: IntersectionObserverEntry[]) => void> = [];
     (IntersectionObserver as ReturnType<typeof vi.fn>).mockImplementation((cb: (e: IntersectionObserverEntry[]) => void) => {
-      capturedCallback = cb;
+      callbacks.push(cb);
       return { observe: vi.fn(), disconnect: vi.fn(), unobserve: vi.fn() };
     });
 
@@ -206,11 +216,12 @@ describe("WorkflowPage", () => {
 
     renderPage();
 
-    if (capturedCallback) {
+    const scrollSpyCallback = callbacks[0];
+    if (scrollSpyCallback) {
       // Make "explorer" visible, "sources" not visible — must wrap in act
       // so the React state update from the IO callback flushes.
       act(() => {
-        capturedCallback!([
+        scrollSpyCallback([
           { isIntersecting: false, target: anchors[0] } as unknown as IntersectionObserverEntry,
           { isIntersecting: true,  target: anchors[1] } as unknown as IntersectionObserverEntry,
         ]);
