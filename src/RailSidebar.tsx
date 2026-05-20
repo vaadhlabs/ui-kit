@@ -389,10 +389,15 @@ export function RailSidebar({
         }}
       >
         {onEnvClick ? (
-          /* Split mode — two buttons side by side inside a shared border frame */
+          /* Split mode — two buttons side by side inside a shared border frame.
+             width: 100% so the flex container stays bounded by the sidebar's
+             216px usable width (240 - 24 padding) instead of growing to fit
+             both children's content (which pushed the env button past the
+             sidebar's right edge — found via Chrome MCP audit 2026-05-19). */
           <Box
             sx={{
               display: "flex",
+              width: "100%",
               background: paper,
               border: `1px solid ${border}`,
               borderRadius: "8px",
@@ -406,6 +411,12 @@ export function RailSidebar({
               tabIndex={isExpanded ? 0 : -1}
               sx={{
                 flex: 1,
+                // minWidth: 0 lets the flex item shrink below its content's
+                // natural size (the default `auto` keeps it from shrinking,
+                // which is why the long tenant name pushed the env button
+                // off the sidebar's right edge). Pair with the ellipsis on
+                // the inner span so long names truncate gracefully.
+                minWidth: 0,
                 display: "flex",
                 alignItems: "center",
                 gap: "6px",
