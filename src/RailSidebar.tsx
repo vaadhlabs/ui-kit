@@ -37,7 +37,6 @@ export type NavItemKey =
   | "reports"
   | "alerts"
   | "enforcement"
-  | "compliance"
   | "admin"
   | "integrations"
   | "settings";
