@@ -89,8 +89,24 @@ export function WorkshopCard({ children, plain, sx, ...rest }: WorkshopCardProps
           />
         </>
       )}
-      {/* Content wrapper keeps children above the ribbon/wash z-stack. */}
-      <Box sx={{ position: "relative" }}>{children}</Box>
+      {/*
+        Content wrapper keeps children above the ribbon/wash z-stack.
+        height: 100% propagates an explicit Card height down to a single
+        in-flow child so Recharts `<ResponsiveContainer height="100%">`
+        and any other %-height consumer can resolve against a real
+        number. Without it, the wrapper collapses to auto (= content
+        height = 0 when the child is a ResponsiveContainer that itself
+        requests 100%) and the chart paints into a 0px box. Caught live
+        on /ai/spend 2026-05-21 — SpendPage worked around it locally
+        with an inner Box (e5d5b0a3); this central fix unblocks every
+        consumer (gpu-mf InstancesPage, dashboard-mf ObserveSection,
+        any future page) without per-call wrapping.
+
+        Safe when Card has no explicit height: height: 100% resolves to
+        the parent's height, which is auto → wrapper stays auto and
+        children render at their natural size, unchanged from before.
+      */}
+      <Box sx={{ position: "relative", height: "100%" }}>{children}</Box>
     </Card>
   );
 }
