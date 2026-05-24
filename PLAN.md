@@ -26,7 +26,7 @@ into a three-package pnpm workspace, wire up tooling, and get CI green.
 
 ---
 
-## Phase 1 — Tokens package
+## Phase 1 — Tokens package ✓ done 2026-05-24
 
 **Scope.** Extract the color palette, spacing scale, and typography constants from
 `packages/react/src/theme.ts` and `packages/react/src/tone.ts` into
@@ -42,6 +42,29 @@ to import from tokens rather than defining values inline.
 **Definition of done.** `pnpm --filter @tensorcost/tokens build` produces a clean dist.
 `packages/react` test suite still passes. `packages/react/src/theme.ts` imports from
 `@tensorcost/tokens` with no inlined duplicates.
+
+**What landed.**
+
+`packages/tokens/src/` now owns: `brand.ts` (`BrandTokens`, `BRAND_TOKENS_LIGHT`,
+`BRAND_TOKENS_DARK`), `tone.ts` (`ToneKind`, `ToneTokens`, `TONE_LIGHT`, `TONE_DARK`),
+`typography.ts` (`TYPOGRAPHY_TOKENS`), `css-vars.ts` (`buildCssVars`), `brand.json`
+(JSON snapshot for non-TS consumers), and a full `index.ts`. Radius and motion tokens
+stay inlined in `brand.ts` — both are <5 entries consumed only via the brand object,
+and a separate file would add noise without benefit.
+
+`packages/react/src/theme.ts` and `tone.ts` now import from `@tensorcost/tokens`; all
+inline definitions are gone. Type names (`BrandTokens`, `ToneKind`, `ToneTokens`) are
+re-exported from the React package so existing import sites don't need updating. The
+`LIGHT`/`DARK` tone constants were renamed to `TONE_LIGHT`/`TONE_DARK` in the tokens
+package to avoid collisions when tree-shaking multiple modules.
+
+Two items intentionally left in `packages/react/` for later phases: the chart
+allocation palette (`ALLOC_LIGHT`/`ALLOC_DARK`) and the workshop section tokens
+(`SECTION_TOKENS_LIGHT`/`SECTION_TOKENS_DARK`). Both are MUI-adjacent or
+workshop-specific and weren't in Phase 1 scope.
+
+Test results: `@tensorcost/tokens` 51 passed; `@tensorcost/ui-kit` 201 passed (no
+regressions). `pnpm typecheck` and `pnpm build` clean across the workspace.
 
 ---
 
