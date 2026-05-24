@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactElement, type ReactNode } from "react";
 import { CssBaseline, useMediaQuery } from "@mui/material";
 import { ThemeProvider as MuiThemeProvider } from "@mui/material/styles";
 import { type ThemeMode } from "./theme.js";
@@ -63,8 +63,8 @@ export function ThemeShellProvider({
   primaryColor,
   secondaryColor,
   defaultSetting = "system",
-}: ThemeShellProviderProps): JSX.Element {
-  const prefersDark = useMediaQuery("(prefers-color-scheme: dark)", { noSsr: true });
+}: ThemeShellProviderProps): ReactElement {
+  const prefersDark = useMediaQuery("(prefers-color-scheme: dark)");
 
   const [setting, setSetting] = useState<ThemeSetting>(() => {
     if (typeof localStorage === "undefined") return defaultSetting;
