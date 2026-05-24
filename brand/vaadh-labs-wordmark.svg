@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 120" role="img" aria-label="Vaadh Labs">
+  <title>Vaadh Labs</title>
+  <text x="130" y="64" text-anchor="middle" font-family="Inter, -apple-system, system-ui, sans-serif" font-weight="800" font-size="44" letter-spacing="7" fill="#0F172A">VAADH</text>
+  <g>
+    <circle cx="54" cy="86" r="3.5" fill="#0F172A"></circle>
+    <circle cx="92" cy="86" r="3.5" fill="#0F172A"></circle>
+    <circle cx="131" cy="86" r="3.5" fill="#0F172A"></circle>
+    <circle cx="170" cy="86" r="3.5" fill="#3B82F6"></circle>
+  </g>
+  <text x="130" y="108" text-anchor="middle" font-family="Inter, -apple-system, system-ui, sans-serif" font-weight="500" font-size="11" letter-spacing="6" fill="#94A3B8">L A B S</text>
+</svg>

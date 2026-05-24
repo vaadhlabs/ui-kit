@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="Vaadh Labs">
+  <title>Vaadh Labs</title>
+  <rect x="1.5" y="1.5" width="117" height="117" rx="28" fill="#ffffff" stroke="#0F172A" stroke-width="3"></rect>
+  <circle cx="30" cy="60" r="8" fill="#0F172A"></circle>
+  <circle cx="50" cy="60" r="8" fill="#0F172A"></circle>
+  <circle cx="70" cy="60" r="8" fill="#0F172A"></circle>
+  <circle cx="90" cy="60" r="8" fill="#3B82F6"></circle>
+</svg>

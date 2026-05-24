@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="TensorCost">
+  <title>TensorCost</title>
+  <rect width="120" height="120" rx="28" fill="#2563EB"></rect>
+  <path d="M54 30 L54 82 Q54 92 64 92 L74 92" stroke="#ffffff" stroke-width="13" stroke-linecap="round" fill="none"></path>
+  <path d="M38 48 L70 48" stroke="#ffffff" stroke-width="13" stroke-linecap="round"></path>
+  <circle cx="84" cy="80" r="9" fill="#ffffff"></circle>
+  <circle cx="84" cy="80" r="3.5" fill="#2563EB"></circle>
+</svg>
