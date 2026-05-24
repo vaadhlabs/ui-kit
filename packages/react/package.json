@@ -38,6 +38,9 @@
     "test": "vitest run --coverage",
     "lint": "eslint src"
   },
+  "dependencies": {
+    "@tensorcost/tokens": "workspace:*"
+  },
   "peerDependencies": {
     "@emotion/react": "^11.13.0",
     "@emotion/styled": "^11.13.0",

@@ -1,4 +1,14 @@
 import { createTheme, darken, getContrastRatio, lighten, type Theme } from "@mui/material/styles";
+import {
+  BRAND_TOKENS_DARK,
+  BRAND_TOKENS_LIGHT,
+  TYPOGRAPHY_TOKENS,
+  buildCssVars,
+} from "@tensorcost/tokens";
+
+// Re-export so downstream consumers that do `import { BrandTokens } from "@tensorcost/ui-kit"`
+// still get the type without an extra import.
+export type { BrandTokens } from "@tensorcost/tokens";
 
 /**
  * TensorCost design tokens, mirrored from apps/gpu-dashboard-frontend's
@@ -7,45 +17,12 @@ import { createTheme, darken, getContrastRatio, lighten, type Theme } from "@mui
  */
 export type ThemeMode = "light" | "dark";
 
-// Navrail brand tokens — added 2026-05-19 for the Rail redesign.
-// These match the token table in design_handoff_navigation_rail/README.md
-// §Design tokens exactly. Exposed on theme.palette.brand.* for component-
-// internal use, and as CSS custom properties for legacy non-MUI consumers.
-export interface BrandTokens {
-  paper: string;
-  bgPage: string;
-  bgSoft: string;
-  ink: string;
-  ink2: string;
-  ink3: string;
-  ink4: string;
-  border: string;
-  borderStrong: string;
-  bgHover: string;
-  selected: string;
-  blue: string;
-  cyan: string;
-  positive: string;
-  warn: string;
-  danger: string;
-  purple: string;
-  radiusSm: string;
-  radiusMd: string;
-  radiusLg: string;
-  radiusXl: string;
-  radiusPill: string;
-  motionFast: string;
-  motionDrawerOpen: string;
-  motionDrawerClose: string;
-  mono: string;
-}
-
 declare module "@mui/material/styles" {
   interface Palette {
-    brand: BrandTokens;
+    brand: import("@tensorcost/tokens").BrandTokens;
   }
   interface PaletteOptions {
-    brand?: Partial<BrandTokens>;
+    brand?: Partial<import("@tensorcost/tokens").BrandTokens>;
   }
 }
 
@@ -60,106 +37,6 @@ function deriveContrastText(hex: string): string {
   // pick black or white text per primary/secondary so light brand colours
   // don't render white-on-pastel.
   return getContrastRatio(hex, "#FFFFFF") >= 3 ? "#FFFFFF" : "#0F172A";
-}
-
-// Navrail brand token sets — values exact per README §Design tokens.
-// The theme file wins when values differ from the spec (per README §Fidelity).
-// Note: background.default is already #0F172A / #F1F5F9 in dark/light; the
-// spec calls bgPage #FAFBFC in light. We keep the existing background.default
-// for the MUI layer (#F1F5F9) and put #FAFBFC in brand.bgPage so Rail
-// components get the spec value without breaking the rest of the app.
-const BRAND_TOKENS_LIGHT: BrandTokens = {
-  paper: "#FFFFFF",
-  bgPage: "#FAFBFC",
-  bgSoft: "#F8FAFC",
-  ink: "#0F172A",
-  // ink2: was #475569 (slate-600, ~4.5:1 on white — borderline AA).
-  // Bumped to #334155 (slate-700, ~7:1) per user contrast feedback 2026-05-19.
-  ink2: "#334155",
-  // ink3: was #94A3B8 (slate-400, ~3.5:1 on white — fails AA).
-  // Bumped to #64748B (slate-500, ~4.6:1) per user contrast feedback 2026-05-19.
-  ink3: "#64748B",
-  ink4: "#CBD5E1",
-  border: "#E2E8F0",
-  borderStrong: "#CBD5E1",
-  bgHover: "#F1F5F9",
-  selected: "rgba(59,130,246,0.08)",
-  blue: "#3B82F6",
-  cyan: "#06B6D4",
-  positive: "#10B981",
-  warn: "#F59E0B",
-  danger: "#EF4444",
-  purple: "#A855F7",
-  radiusSm: "6px",
-  radiusMd: "8px",
-  radiusLg: "10px",
-  radiusXl: "12px",
-  radiusPill: "999px",
-  motionFast: "150ms cubic-bezier(0.4, 0, 0.2, 1)",
-  motionDrawerOpen: "240ms cubic-bezier(0.4, 0, 0.2, 1)",
-  motionDrawerClose: "200ms cubic-bezier(0.4, 0, 0.2, 1)",
-  mono: "'JetBrains Mono', ui-monospace, 'Cascadia Code', monospace",
-};
-
-const BRAND_TOKENS_DARK: BrandTokens = {
-  paper: "#1E293B",
-  bgPage: "#0F172A",
-  bgSoft: "#172033",
-  ink: "#F8FAFC",
-  ink2: "#CBD5E1",
-  ink3: "#94A3B8",
-  ink4: "#475569",
-  border: "rgba(148,163,184,0.16)",
-  borderStrong: "rgba(148,163,184,0.28)",
-  bgHover: "rgba(255,255,255,0.05)",
-  selected: "rgba(59,130,246,0.18)",
-  blue: "#60A5FA",
-  cyan: "#22D3EE",
-  positive: "#34D399",
-  warn: "#FBBF24",
-  danger: "#F87171",
-  purple: "#C084FC",
-  radiusSm: "6px",
-  radiusMd: "8px",
-  radiusLg: "10px",
-  radiusXl: "12px",
-  radiusPill: "999px",
-  motionFast: "150ms cubic-bezier(0.4, 0, 0.2, 1)",
-  motionDrawerOpen: "240ms cubic-bezier(0.4, 0, 0.2, 1)",
-  motionDrawerClose: "200ms cubic-bezier(0.4, 0, 0.2, 1)",
-  mono: "'JetBrains Mono', ui-monospace, 'Cascadia Code', monospace",
-};
-
-/**
- * Builds the :root / [data-theme="dark"] CSS custom-property block that
- * non-MUI consumers can read. Generated at theme-creation time so the
- * string is ready for MuiCssBaseline's globalStyles injection.
- */
-function buildCssVars(t: BrandTokens): string {
-  return `
-    --paper: ${t.paper};
-    --bgPage: ${t.bgPage};
-    --bgSoft: ${t.bgSoft};
-    --ink: ${t.ink};
-    --ink2: ${t.ink2};
-    --ink3: ${t.ink3};
-    --ink4: ${t.ink4};
-    --border: ${t.border};
-    --borderStrong: ${t.borderStrong};
-    --bgHover: ${t.bgHover};
-    --selected: ${t.selected};
-    --blue: ${t.blue};
-    --cyan: ${t.cyan};
-    --positive: ${t.positive};
-    --warn: ${t.warn};
-    --danger: ${t.danger};
-    --purple: ${t.purple};
-    --radius-sm: ${t.radiusSm};
-    --radius-md: ${t.radiusMd};
-    --radius-lg: ${t.radiusLg};
-    --radius-xl: ${t.radiusXl};
-    --radius-pill: ${t.radiusPill};
-  `.trim();
 }
 
 export function createTensorTheme(mode: ThemeMode, overrides?: { primary?: string; secondary?: string }): Theme {
@@ -214,12 +91,15 @@ export function createTensorTheme(mode: ThemeMode, overrides?: { primary?: strin
       brand,
     },
     typography: {
-      fontFamily: "'Inter', 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif",
-      h4: { fontWeight: 700, fontSize: "1.5rem", letterSpacing: "-0.02em" },
-      h5: { fontWeight: 600, fontSize: "1.125rem", letterSpacing: "-0.01em" },
-      h6: { fontWeight: 600, fontSize: "0.9375rem", letterSpacing: "-0.01em" },
-      overline: { fontWeight: 700, letterSpacing: "0.08em", fontSize: "0.625rem" },
-      button: { textTransform: "none", fontWeight: 600 },
+      fontFamily: TYPOGRAPHY_TOKENS.fontFamily,
+      h4: TYPOGRAPHY_TOKENS.h4,
+      h5: TYPOGRAPHY_TOKENS.h5,
+      h6: TYPOGRAPHY_TOKENS.h6,
+      overline: TYPOGRAPHY_TOKENS.overline,
+      // MUI's typography.button expects `textTransform` as a CSSObject value.
+      // The token stores "none" as a plain string — cast is safe since MUI
+      // accepts it and the compile-time type is just `string`.
+      button: TYPOGRAPHY_TOKENS.button as { textTransform: "none"; fontWeight: number },
     },
     shape: { borderRadius: 8 },
     components: {
