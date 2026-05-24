@@ -4,7 +4,7 @@ The design system for [TensorCost](https://tensorcost.com). Three packages under
 
 | Package | Name | What it is |
 |---------|------|------------|
-| `packages/react` | `@tensorcost/ui-kit` | MUI 5-based React components — layout shells, data tables, metric cards, charts |
+| `packages/react` | `@tensorcost/ui-kit` | MUI 7-based React components — layout shells, data tables, metric cards, charts |
 | `packages/tokens` | `@tensorcost/tokens` | Design tokens (colors, spacing, type scale) without any React/MUI dependency |
 | `packages/slides` | `@tensorcost/slides` | React-to-image pipeline for PPT/marketing via `@vercel/satori` |
 
@@ -35,6 +35,35 @@ pnpm build-storybook  # static Storybook build (CI gate + GH Pages in Phase 4)
 pnpm changeset        # open the changeset prompt to describe a change
 pnpm version-packages # bump versions based on pending changesets
 ```
+
+## Consumer setup
+
+`@tensorcost/ui-kit` requires `@mui/material ^7`, `@emotion/react ^11.14`, and
+`@emotion/styled ^11.14` as peer dependencies. Install them alongside the package.
+
+### Font loading
+
+The kit uses JetBrains Mono for monospace slots (the `BrandTokens.mono` token, nav
+rail hints, badge counts, kbd shortcuts). The kit does not inject the font itself —
+doing so via `MuiCssBaseline` was a MUI 5 hack that MUI 7 removed, and a library
+injecting a Google Fonts URL into every app's global stylesheet is presumptuous anyway.
+
+Load the font in your app's HTML `<head>` or global CSS:
+
+```html
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap"
+  rel="stylesheet"
+/>
+```
+
+Alternatively, bundle the font via a local `@font-face` declaration — the
+`BrandTokens.mono` value is `"'JetBrains Mono', ui-monospace, monospace"`, so the
+browser will fall back to the system monospace if the custom font is absent.
+
+---
 
 ## Adding a component
 

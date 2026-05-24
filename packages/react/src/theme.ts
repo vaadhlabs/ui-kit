@@ -110,12 +110,22 @@ export function createTensorTheme(mode: ThemeMode, overrides?: { primary?: strin
           // (the shell sets this attribute when switching modes).
           ":root": buildCssVars(BRAND_TOKENS_LIGHT),
           '[data-theme="dark"]': buildCssVars(BRAND_TOKENS_DARK),
-          // Load JetBrains Mono if the browser hasn't already fetched it.
-          // The CSP in security-headers.middleware.ts already allows
-          // fonts.googleapis.com and fonts.gstatic.com.
-          "@import": [
-            "url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap')",
-          ],
+          // JetBrains Mono is NOT loaded here. MUI 7 removed the undocumented
+          // "@import" shorthand in MuiCssBaseline.styleOverrides, so injecting
+          // a font via that key silently does nothing in v7. More importantly,
+          // a shared component library should not own the font-loading strategy
+          // of its consumers — some apps bundle fonts, others use a CDN link,
+          // others have a stricter CSP than fonts.googleapis.com.
+          //
+          // Consumers must load JetBrains Mono themselves. The canonical font
+          // stack is in @tensorcost/tokens as `BrandTokens.mono`. The simplest
+          // HTML approach:
+          //
+          //   <link rel="preconnect" href="https://fonts.googleapis.com" />
+          //   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+          //   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+          //
+          // See "Consumer setup" in the ui-kit README for the full options.
         },
       },
       MuiCard: {
