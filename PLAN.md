@@ -135,6 +135,37 @@ update any consumers.
 a direct counterpart in `@tensorcost/ui-kit` or a documented deprecation. Coverage
 thresholds still met.
 
+### Phase 3a — Parallel port (two batches, 2026-05-24)
+
+Classification audit completed (see `docs/PORTING-COMPONENT-LIBRARY.md`).
+Components split across two agents working simultaneously on disjoint file sets.
+
+**Batch 1** — MarkdownRichText (MarkdownBody), ContentBlock (MarketingContentBlock),
+TabsSection, Hero (MarketingHero), CTABanner (MarketingCTABanner), Testimonials,
+FAQAccordion, Timeline, Proof (ProofSection). See `marketing/` dir.
+
+**Batch 2 — done 2026-05-24** — FeatureGrid, LogosStrip, StatsStrip, StatsCounter,
+ImageGallery, VideoEmbed, Comparison (ComparisonTable), PilotFindings, Guarantee.
+All 9 components ported to `packages/react/src/marketing/`. 48 new spec assertions
+pass, typecheck clean, build clean.
+
+Key decisions made in Batch 2:
+
+- framer-motion confirmed unused in all source components (zero imports found);
+  not added as a dependency.
+- StatsCounter animation: kept the IntersectionObserver + JS setInterval count-up
+  from the source (pure JS, 2 s / 60 steps). No framer-motion. Guard added for
+  jsdom environments (`typeof IntersectionObserver === 'undefined'` check).
+- ImageGallery lightbox replaced custom fixed-position overlay with MUI `<Dialog>`
+  for proper keyboard focus trap and a11y.
+- ComparisonTable replaced injected `<style>` block with MUI sx props — eliminates
+  global CSS leakage in micro-frontend contexts.
+- Icon substitutions: all lucide icons replaced with `@mui/icons-material`. Two
+  non-1:1 mappings: `BrainCircuit → PsychologyIcon`, `GitBranch → AccountTreeIcon`.
+  lucide-react is NOT added as a dependency.
+
+**Barrel wiring** (`marketing/index.ts`, `index.ts`) pending orchestrator commit.
+
 ---
 
 ## Phase 4 — Storybook stories + GH Pages deploy (partial — 2026-05-24)
