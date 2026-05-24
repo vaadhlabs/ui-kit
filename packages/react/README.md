@@ -60,4 +60,4 @@ Live component reference: built locally with `pnpm storybook` from the kit's rep
 
 ## License
 
-UNLICENSED — internal TensorCost use. Not for public distribution.
+Apache 2.0 — see [LICENSE](../../LICENSE) at the repo root.
