@@ -29,7 +29,20 @@
     "directory": "packages/react"
   },
   "publishConfig": {
-    "access": "restricted"
+    "access": "public"
+  },
+  "description": "TensorCost design system — React components, MUI 7 theme, semantic tone palette, charts. The canonical UI kit for TensorCost apps, the marketing site, and slide pipelines.",
+  "keywords": [
+    "tensorcost",
+    "design-system",
+    "ui-kit",
+    "react",
+    "mui",
+    "components"
+  ],
+  "homepage": "https://github.com/vaadhlabs/ui-kit#readme",
+  "bugs": {
+    "url": "https://github.com/vaadhlabs/ui-kit/issues"
   },
   "scripts": {
     "build": "tsup",

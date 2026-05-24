@@ -3,11 +3,11 @@
   "changelog": "@changesets/cli/changelog",
   "commit": false,
   "fixed": [
-    ["@tensorcost/tokens", "@tensorcost/ui-kit", "@tensorcost/slides"]
+    ["@tensorcost/tokens", "@tensorcost/ui-kit"]
   ],
   "linked": [],
-  "access": "restricted",
+  "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
-  "ignore": []
+  "ignore": ["@tensorcost/slides"]
 }

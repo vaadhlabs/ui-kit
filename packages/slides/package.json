@@ -1,6 +1,7 @@
 {
   "name": "@tensorcost/slides",
-  "version": "0.1.0",
+  "version": "0.0.0",
+  "private": true,
   "type": "module",
   "license": "UNLICENSED",
   "main": "./dist/index.js",
@@ -18,9 +19,7 @@
     "url": "https://github.com/vaadhlabs/ui-kit.git",
     "directory": "packages/slides"
   },
-  "publishConfig": {
-    "access": "restricted"
-  },
+  "description": "TensorCost slide-pipeline — React components rendered to PNG for embedding into pptx via python-pptx. WIP (Phase 5).",
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",

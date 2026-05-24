@@ -40,7 +40,18 @@
     "directory": "packages/tokens"
   },
   "publishConfig": {
-    "access": "restricted"
+    "access": "public"
+  },
+  "description": "TensorCost design tokens — brand colors, tone palette, typography scale, radius, motion. Framework-agnostic source of truth consumed by @tensorcost/ui-kit, the marketing site, and the slide pipeline.",
+  "keywords": [
+    "tensorcost",
+    "design-tokens",
+    "design-system",
+    "tokens"
+  ],
+  "homepage": "https://github.com/vaadhlabs/ui-kit#readme",
+  "bugs": {
+    "url": "https://github.com/vaadhlabs/ui-kit/issues"
   },
   "scripts": {
     "build": "tsup",
