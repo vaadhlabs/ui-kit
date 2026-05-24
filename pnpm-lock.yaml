@@ -77,6 +77,10 @@ importers:
         version: 5.4.21
 
   packages/react:
+    dependencies:
+      '@tensorcost/tokens':
+        specifier: workspace:*
+        version: link:../tokens
     devDependencies:
       '@emotion/react':
         specifier: ^11.13.0

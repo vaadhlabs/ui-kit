@@ -11,7 +11,28 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
-    }
+    },
+    "./brand": {
+      "types": "./dist/brand.d.ts",
+      "import": "./dist/brand.js",
+      "require": "./dist/brand.cjs"
+    },
+    "./tone": {
+      "types": "./dist/tone.d.ts",
+      "import": "./dist/tone.js",
+      "require": "./dist/tone.cjs"
+    },
+    "./typography": {
+      "types": "./dist/typography.d.ts",
+      "import": "./dist/typography.js",
+      "require": "./dist/typography.cjs"
+    },
+    "./css-vars": {
+      "types": "./dist/css-vars.d.ts",
+      "import": "./dist/css-vars.js",
+      "require": "./dist/css-vars.cjs"
+    },
+    "./brand.json": "./src/brand.json"
   },
   "repository": {
     "type": "git",
