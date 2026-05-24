@@ -5,16 +5,18 @@ import {
   type ReactNode,
 } from "react";
 import { Box } from "@mui/material";
-import { useTheme } from "@mui/material/styles";
+import { useTheme, alpha, type Theme } from "@mui/material/styles";
 import { StatusBadge, type StatusBadgeKind } from "./StatusBadge.js";
 
-// WorkflowCard — navrail primitive (2026-05-19)
+// WorkflowCard — navrail primitive (2026-05-19, chrome revised 2026-05-24)
 //
 // Spec: design_handoff_navigation_rail/README.md §Workflow card anatomy
-// Container styled per spec: paper bg, 1px border, 12px radius, 22px padding.
-// No numeric step badge — per user override (dropped entirely).
-// Focus ring: blue border + 4px outer glow at 22% alpha.
-// Fades out 300ms after 4s of no interaction.
+// Flat-card chrome: background.paper surface, 1px divider border, 12px radius.
+// No gradient, no top-stripe. When a status is present, a 4px left-edge
+// accent stripe appears in the status palette color (success/warning/error/info).
+//
+// Focus ring: box-shadow 0 0 0 4px primary.main at 22% alpha. Fades 300ms
+// after 4s of no interaction with the card.
 
 export interface WorkflowCardStatus {
   kind: StatusBadgeKind;
@@ -38,6 +40,17 @@ const FOCUS_IDLE_MS = 4_000;
 // FOCUS_FADE_MS: duration of the fade-out animation per spec §Motion.
 const FOCUS_FADE_MS = 300;
 
+// Maps StatusBadgeKind to the palette color for the left-edge accent stripe.
+function statusAccentColor(kind: StatusBadgeKind, theme: Theme): string {
+  switch (kind) {
+    case "ok":     return theme.palette.success.main;
+    case "warn":   return theme.palette.warning.main;
+    case "danger": return theme.palette.error.main;
+    case "info":
+    default:       return (theme.palette as unknown as { info?: { main: string } }).info?.main ?? theme.palette.primary.main;
+  }
+}
+
 export function WorkflowCard({
   anchor,
   title,
@@ -47,12 +60,9 @@ export function WorkflowCard({
   children,
 }: WorkflowCardProps): JSX.Element {
   const theme = useTheme();
-  const isDark = theme.palette.mode === "dark";
-  const brand = theme.palette.brand;
-  const blue = brand?.blue ?? "#3B82F6";
 
   // ringVisible tracks whether the focus-ring glow is at full opacity.
-  // It starts true when focus=true, then fades after FOCUS_IDLE_MS of no
+  // Starts true when focus=true, then fades after FOCUS_IDLE_MS of no
   // interaction on the card.
   const [ringVisible, setRingVisible] = useState(focus);
   const idleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -62,7 +72,6 @@ export function WorkflowCard({
     setRingVisible(focus);
     if (!focus) return;
 
-    // Start the idle countdown when focus is granted.
     scheduleRingFade();
     return () => {
       if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
@@ -84,10 +93,10 @@ export function WorkflowCard({
     scheduleRingFade();
   }
 
-  const borderColor = focus ? blue : (brand?.border ?? "#E2E8F0");
-  const glowAlpha = isDark ? "29" : "38"; // 0x22 = 34 dec, ~13%; 0x38 = 56, ~22%
+  const accentColor = status ? statusAccentColor(status.kind, theme) : null;
+
   const boxShadow = focus && ringVisible
-    ? `0 0 0 4px ${blue}${glowAlpha}`
+    ? `0 0 0 4px ${alpha(theme.palette.primary.main, 0.22)}`
     : "none";
 
   return (
@@ -107,21 +116,17 @@ export function WorkflowCard({
         onMouseMove={handleInteraction}
         onKeyDown={handleInteraction}
         sx={{
-          // brand.paper resolves to the correct card surface per mode:
-          //   light: #FFFFFF, dark: #1E293B
-          // Fallback to theme.palette.background.paper so MFs that use
-          // createWorkshopTheme (which has no brand tokens) also get
-          // the right dark-mode surface instead of the hardcoded white.
-          background: brand?.paper ?? theme.palette.background.paper,
-          border: `1px solid ${borderColor}`,
-          borderRadius: brand?.radiusXl ?? "12px",
+          position: "relative",
+          overflow: "hidden",
+          bgcolor: "background.paper",
+          border: `1px solid ${theme.palette.divider}`,
+          borderRadius: `${theme.shape.borderRadius * 1.5}px`,
           padding: "22px",
-          // Smooth border color transition for focus-ring on/off per spec §Motion
+          // Smooth focus ring transition
           transition: [
-            `border-color ${brand?.motionFast ?? "150ms cubic-bezier(0.4,0,0.2,1)"}`,
             `box-shadow ${
               ringVisible
-                ? brand?.motionFast ?? "150ms cubic-bezier(0.4,0,0.2,1)"
+                ? "150ms cubic-bezier(0.4,0,0.2,1)"
                 : `${FOCUS_FADE_MS}ms ease-out`
             }`,
           ].join(", "),
@@ -129,13 +134,32 @@ export function WorkflowCard({
         }}
         aria-label={title}
       >
-        {/* Card header: title + subtitle + status badge */}
+        {/* 4px left-edge accent stripe — only when a status is present.
+            Neutral cards (no status) render with no chrome accent at all. */}
+        {accentColor && (
+          <Box
+            aria-hidden
+            sx={{
+              position: "absolute",
+              left: 0,
+              top: 0,
+              bottom: 0,
+              width: "4px",
+              bgcolor: accentColor,
+            }}
+          />
+        )}
+
+        {/* Card header: title + subtitle + status badge.
+            Left-pad by 12px when the accent stripe is present so the title
+            doesn't sit flush against it. */}
         <Box
           sx={{
             display: "flex",
             alignItems: "flex-start",
             justifyContent: "space-between",
             mb: "14px",
+            pl: accentColor ? "12px" : 0,
           }}
         >
           <Box>
@@ -146,7 +170,7 @@ export function WorkflowCard({
                 fontSize: 18,
                 fontWeight: 600,
                 letterSpacing: "-0.01em",
-                color: brand?.ink ?? theme.palette.text.primary,
+                color: "text.primary",
                 fontFamily: "'Inter', system-ui, sans-serif",
               }}
             >
@@ -156,7 +180,7 @@ export function WorkflowCard({
               <Box
                 sx={{
                   fontSize: 12,
-                  color: brand?.ink2 ?? theme.palette.text.secondary,
+                  color: "text.secondary",
                   mt: "2px",
                   fontFamily: "'Inter', system-ui, sans-serif",
                 }}
@@ -167,7 +191,11 @@ export function WorkflowCard({
           </Box>
           {status && <StatusBadge kind={status.kind} text={status.text} />}
         </Box>
-        {children}
+
+        {/* Children sit inside the content area, left-padded when stripe is present. */}
+        <Box sx={{ pl: accentColor ? "12px" : 0 }}>
+          {children}
+        </Box>
       </Box>
     </>
   );

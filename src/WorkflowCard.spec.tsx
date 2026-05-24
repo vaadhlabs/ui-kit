@@ -118,8 +118,8 @@ describe("WorkflowCard", () => {
     const section = document.querySelector("section");
     expect(section).not.toBeNull();
 
-    // Initially the ring should be active — border-color should contain blue
-    const initialBorder = section!.getAttribute("style") ?? "";
+    // Initially the ring should be active — box-shadow glow at primary.main 22% alpha
+    const _initialStyle = section!.getAttribute("style") ?? "";
     // After 4s idle + 300ms fade the ring state transitions — we just
     // verify the timer fires without throwing.
     act(() => {
