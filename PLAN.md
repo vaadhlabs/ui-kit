@@ -98,7 +98,7 @@ thresholds still met.
 
 ---
 
-## Phase 4 — Storybook stories + GH Pages deploy
+## Phase 4 — Storybook stories + GH Pages deploy (partial — 2026-05-24)
 
 **Scope.** Write at least one story per exported component in `packages/react/src/`.
 Configure `apps/storybook` with a MUI ThemeProvider decorator so components render with
@@ -110,6 +110,43 @@ GH Pages on every push to main.
 
 **Definition of done.** `pnpm build-storybook` exits 0. Every exported component has
 at least a default story. GH Pages URL is accessible.
+
+**What landed (partial — stories + decorator; GH Pages workflow pending).**
+
+Theme decorator: `apps/storybook/.storybook/preview.ts` now wraps every story in
+`<ThemeProvider theme={createTensorTheme(mode)}>` + `<CssBaseline>`. A `globalTypes`
+entry exposes the light/dark toggle in the Storybook toolbar.
+
+Stories: 30 stories across 6 files, 38 total entries in the static index (including
+autodocs pages).
+
+- `packages/tokens/src/tokens.stories.tsx` — `Foundation/Brand / Overview`: color
+  swatches for BRAND_TOKENS_LIGHT/DARK, tone chips for all 5 ToneKind values,
+  typography specimen, radius scale, motion token table.
+- `packages/react/src/MetricCard.stories.tsx` — 6 stories: Default, WithDelta ×2,
+  Warning, Mini, CustomHexColor.
+- `packages/react/src/WorkflowCard.stories.tsx` — 7 stories: Default, WithStatus ×4,
+  WithFocusRing, WithAnchor.
+- `packages/react/src/StatusBadge.stories.tsx` — 7 stories: Default, AllTones,
+  AllTonesLabeled, Ok/Warn/Danger/Info.
+- `packages/react/src/DataTable.stories.tsx` — 5 stories: WithRows, Empty, Loading,
+  WithError, ClickableRows.
+- `packages/react/src/RailSidebar.stories.tsx` — 6 stories: Default (collapsed),
+  PinnedOpen, WithAlertsBadge, WithItemBadge, WithEnvClick, ActiveHome.
+
+Supporting fixes: `packages/react/tsconfig.json` and `vitest.config.ts` exclude
+`*.stories.*` from typecheck and coverage (same pattern as existing test-file
+exclusions). `packages/tokens/tsconfig.json` same. `apps/storybook/package.json`
+adds `@emotion/react`, `@emotion/styled`, `@mui/material`, `@tensorcost/tokens` as
+direct dependencies. `apps/storybook/.storybook/main.ts` path corrected from
+`../../packages` to `../../../packages` (Storybook 8 resolves globs relative to the
+`.storybook/` config dir, not the app root).
+
+Build output: `pnpm build-storybook` exits 0, 38 story entries, static export 6.6 MB.
+`pnpm typecheck` clean. 252 tests pass (51 tokens + 201 react), coverage thresholds met.
+
+**Remaining for Phase 4 completion:** GH Actions `pages.yml` workflow (`.github/workflows/`).
+Stories for remaining exported components not covered in this partial pass.
 
 ---
 
