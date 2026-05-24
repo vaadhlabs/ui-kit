@@ -1,0 +1,26 @@
+TensorCost UI Kit
+Copyright 2026 Vaadh Labs (TensorCost)
+
+This product includes software developed by Vaadh Labs.
+Licensed under the Apache License, Version 2.0 — see LICENSE.
+
+This kit depends on (and bundles type/runtime references to) third-party
+software distributed under their own licenses. The full set of runtime and
+peer dependencies is declared in each package's package.json; the
+corresponding license texts ship with those packages under node_modules/.
+Notable dependencies:
+
+  MUI (@mui/material, @mui/icons-material)  MIT
+  Emotion (@emotion/react, @emotion/styled)  MIT
+  React, React DOM                          MIT
+  Recharts                                  MIT
+  react-markdown, rehype-raw                MIT
+  clsx                                      MIT
+  Storybook (devDependency)                 MIT
+  Vite, tsup, vitest (devDependency)        MIT
+
+The TensorCost name and logos in the `brand/` directory are trademarks of
+Vaadh Labs. The Apache 2.0 license grants permission to use, modify, and
+redistribute the code; it does NOT grant permission to use the TensorCost
+trademarks, except as required to describe the origin of the work. See
+Section 6 of the Apache 2.0 license for the trademark clause.

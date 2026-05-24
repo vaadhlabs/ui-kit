@@ -1,20 +1,22 @@
 # TensorCost UI Kit
 
-The design system for [TensorCost](https://tensorcost.com). Three packages under one roof:
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
+
+The design system for TensorCost — three packages, one canonical source of truth for tokens and components consumed across the product app, the marketing site, and the slide pipeline.
 
 | Package | Name | What it is |
 |---------|------|------------|
-| `packages/react` | `@tensorcost/ui-kit` | MUI 7-based React components — layout shells, data tables, metric cards, charts |
-| `packages/tokens` | `@tensorcost/tokens` | Design tokens (colors, spacing, type scale) without any React/MUI dependency |
-| `packages/slides` | `@tensorcost/slides` | React-to-image pipeline for PPT/marketing via `@vercel/satori` |
+| `packages/tokens` | `@tensorcost/tokens` | Brand tokens, tone palette, typography. Framework-agnostic. No React, no MUI. |
+| `packages/react` | `@tensorcost/ui-kit` | React components on MUI 7 + tokens — app chrome (MetricCard, DataTable, RailSidebar) + marketing primitives (Hero, FeatureGrid, Testimonials, …) |
+| `packages/slides` | `@tensorcost/slides` | React-to-image pipeline for PPT generation via `@vercel/satori`. WIP (Phase 5). |
 
-Storybook lives under `apps/storybook/`.
+Storybook lives under `apps/storybook/`. Local: `pnpm storybook` → `http://localhost:6006`.
 
-## Who consumes this
+## Who this is for
 
-- **tensorcost MF apps** — the micro-frontend shell and all feature MFs import `@tensorcost/ui-kit` and `@tensorcost/ui-kit/theme` via workspace symlink today; they'll switch to the published npm package once Phase 0 is proven stable.
-- **websites/website** — the marketing site will pull `@tensorcost/tokens` for consistent brand colors.
-- **Marketing PPT pipeline** — `@tensorcost/slides` will render React components to PNG frames that drop into PowerPoint templates.
+Anyone building a React app with a need for a coherent component set. The kit is opinionated — MUI 7 + Emotion is the runtime, tokens are the source of truth, components are typed. Most useful if you're starting fresh; portable enough to drop into an existing MUI 5/6 app once the version bump is done.
+
+The kit is open source under Apache 2.0. Contributions, issues, and forks welcome.
 
 ## Prerequisites
 
@@ -30,7 +32,7 @@ pnpm test             # vitest run across all packages (coverage on packages/rea
 pnpm build            # tsup builds all three packages to dist/
 
 pnpm storybook        # start Storybook at http://localhost:6006
-pnpm build-storybook  # static Storybook build (CI gate + GH Pages in Phase 4)
+pnpm build-storybook  # static Storybook build (CI gate + GH Pages deploy)
 
 pnpm changeset        # open the changeset prompt to describe a change
 pnpm version-packages # bump versions based on pending changesets
@@ -67,14 +69,29 @@ browser will fall back to the system monospace if the custom font is absent.
 
 ## Adding a component
 
-Drop a new `.tsx` file into `packages/react/src/`, re-export it from `packages/react/src/index.ts`, and write a spec alongside it (or under `src/__tests__/`). The vitest config picks up both `*.spec.tsx` and `__tests__/*.test.tsx`.
+Drop a new `.tsx` file into `packages/react/src/` (or `packages/react/src/marketing/` if it's a marketing primitive), re-export it from the corresponding `index.ts`, and write a spec alongside it (or under `__tests__/`). The vitest config picks up both `*.spec.tsx` and `__tests__/*.test.tsx`.
 
-Storybook stories go in the same `src/` directory as the component, named `ComponentName.stories.tsx`. The `apps/storybook` main config globs `../../packages/*/src/**/*.stories.@(ts|tsx|mdx)`, so no manual registration needed.
+Storybook stories go in the same directory as the component, named `ComponentName.stories.tsx`. The `apps/storybook` main config globs `../../../packages/*/src/**/*.stories.@(ts|tsx|mdx)`, so no manual registration needed.
 
 ## npm scope
 
-All published packages use the `@tensorcost` scope. Access is restricted — the registry token lives in CI secrets; local `npm login` to the `@tensorcost` scope is required for manual publishes.
+All published packages use the `@tensorcost` scope, published as **public** packages. Manual publish flow:
+
+```sh
+npm login                  # authenticate to the @tensorcost npm org
+pnpm changeset             # author a changeset describing the change
+pnpm changeset version     # bump versions + generate CHANGELOG entries
+pnpm build                 # rebuild dist/ for the new version
+pnpm changeset publish     # publish to npm
+git push --follow-tags     # push the version commit + tag
+```
+
+The `.github/workflows/release.yml` automates this flow on tag push once the `NPM_TOKEN` secret is configured at the repo.
 
 ## Brand assets
 
 Static logo files live in `brand/` at the repo root: SVG, PNG, and JPG variants of the TensorCost mark, lockup, and mono mark, plus Vaadh Labs icon and wordmark.
+
+## License
+
+Apache 2.0 — see [LICENSE](LICENSE). Copyright 2026 Vaadh Labs (TensorCost).
