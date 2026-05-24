@@ -140,9 +140,34 @@ thresholds still met.
 Classification audit completed (see `docs/PORTING-COMPONENT-LIBRARY.md`).
 Components split across two agents working simultaneously on disjoint file sets.
 
-**Batch 1** — MarkdownRichText (MarkdownBody), ContentBlock (MarketingContentBlock),
-TabsSection, Hero (MarketingHero), CTABanner (MarketingCTABanner), Testimonials,
-FAQAccordion, Timeline, Proof (ProofSection). See `marketing/` dir.
+**Batch 1 — done 2026-05-24** — MarkdownRichText (MarkdownBody), ContentBlock
+(MarketingContentBlock), TabsSection, Hero (MarketingHero), CTABanner
+(MarketingCTABanner), Testimonials, FAQAccordion, Timeline, Proof (ProofSection).
+All 9 components ported to `packages/react/src/marketing/`. 54 new spec assertions
+pass (315 total tests), typecheck clean, build clean.
+
+Key decisions made in Batch 1:
+
+- framer-motion confirmed unused; not added as a dependency.
+- FAQAccordion uses MUI `Accordion`/`AccordionSummary`/`AccordionDetails` (stable
+  in @mui/material core since v5) rather than the hand-rolled scroll-height animation.
+  lucide `ChevronDown` replaced by MUI's built-in `ExpandMore` in the AccordionSummary.
+- Timeline uses a custom MUI Box layout (not @mui/lab Timeline) — ui-kit doesn't
+  depend on @mui/lab; adding it for one component is not warranted.
+- TabsSection icon resolution uses a curated ICON_MAP (same set as FeatureGrid) rather
+  than the wildcard `* as Icons from 'lucide-react'` dynamic lookup. Unknown icon names
+  silently produce no icon — same fallback as the original.
+- ProofSection renamed from `Proof` to avoid collision with any future assertion-library
+  export. Markdown link color reads from `theme.palette.primary.light` in dark mode,
+  falling back to sky-blue `#38bdf8` in light (matches the original CRT terminal look).
+- All three dangerouslySetInnerHTML sites (FAQAccordion answers, Timeline descriptions)
+  carry `// trusted-cms-content` comments per the brief.
+- rehype-raw security note present in MarkdownBody, MarketingContentBlock, TabsSection,
+  ProofSection (4 files).
+- Icon substitutions (lucide → MUI): ChevronLeft/Right → KeyboardArrowLeft/Right,
+  Star → StarIcon, ChevronDown → ExpandMore (MUI built-in in Accordion).
+  `BrainCircuit → Psychology`, `GitBranch → AccountTree` (non-1:1, noted in comments).
+  lucide-react is NOT added as a dependency.
 
 **Batch 2 — done 2026-05-24** — FeatureGrid, LogosStrip, StatsStrip, StatsCounter,
 ImageGallery, VideoEmbed, Comparison (ComparisonTable), PilotFindings, Guarantee.
