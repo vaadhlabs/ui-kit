@@ -5,3 +5,4 @@ coverage/
 storybook-static/
 *.tsbuildinfo
 .DS_Store
+**/.DS_Store
