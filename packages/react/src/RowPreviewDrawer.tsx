@@ -1,4 +1,4 @@
-import { useEffect, type ReactNode } from "react";
+import { useEffect, type ReactElement, type ReactNode } from "react";
 import { Box, ButtonBase, IconButton, Button } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { Close as CloseIcon, OpenInNew as OpenInNewIcon } from "@mui/icons-material";
@@ -32,7 +32,7 @@ export function RowPreviewDrawer({
   onClose,
   onOpenPage,
   children,
-}: RowPreviewDrawerProps): JSX.Element {
+}: RowPreviewDrawerProps): ReactElement {
   const theme = useTheme();
   const isDark = theme.palette.mode === "dark";
   const b = theme.palette.brand;

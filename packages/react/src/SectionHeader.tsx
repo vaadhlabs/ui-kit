@@ -1,5 +1,5 @@
 import { Box, Typography } from "@mui/material";
-import type { ReactNode } from "react";
+import type { ReactElement, ReactNode } from "react";
 
 /**
  * Workshop section-header pattern: 28px h2 title with optional subtitle
@@ -41,7 +41,7 @@ export function SectionHeader({
   subtitle,
   action,
   headingLevel = "h2",
-}: SectionHeaderProps): JSX.Element {
+}: SectionHeaderProps): ReactElement {
   return (
     <Box
       sx={{

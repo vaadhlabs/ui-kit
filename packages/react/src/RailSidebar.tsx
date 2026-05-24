@@ -1,4 +1,4 @@
-import { type ComponentType, type ReactNode, useEffect, useRef, useState } from "react";
+import { type ComponentType, type ReactElement, type ReactNode, useEffect, useRef, useState } from "react";
 import { Box, ButtonBase, IconButton, Tooltip } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import {
@@ -147,7 +147,7 @@ export function RailSidebar({
   pinned: externalPinned,
   onPinChange,
   logoSlot,
-}: RailSidebarProps): JSX.Element {
+}: RailSidebarProps): ReactElement {
   const theme = useTheme();
   const isDark = theme.palette.mode === "dark";
   const b = theme.palette.brand;

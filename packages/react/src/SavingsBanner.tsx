@@ -1,4 +1,5 @@
 import { Box, Button, Paper, Skeleton, Typography, useTheme } from "@mui/material";
+import type { ReactElement } from "react";
 import { formatMoney } from "./charts.js";
 
 export interface SavingsBannerProps {
@@ -104,7 +105,7 @@ export function SavingsBanner({
   loading = false,
   hidden = false,
   variant = "full",
-}: SavingsBannerProps): JSX.Element | null {
+}: SavingsBannerProps): ReactElement | null {
   const theme = useTheme();
   const isDark = theme.palette.mode === "dark";
 

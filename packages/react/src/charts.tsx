@@ -1,5 +1,5 @@
 import { Box, Paper, Typography, useTheme } from "@mui/material";
-import type { ReactNode } from "react";
+import type { ReactElement, ReactNode } from "react";
 
 /** Shared chart colour tokens. Kept in sync with theme.ts palette. */
 export const CHART_COLORS = {
@@ -51,7 +51,7 @@ export interface ChartTooltipProps {
   formatter?: (v: number | string | undefined) => ReactNode;
 }
 
-export function ChartTooltip({ active, payload, label, formatter }: ChartTooltipProps): JSX.Element | null {
+export function ChartTooltip({ active, payload, label, formatter }: ChartTooltipProps): ReactElement | null {
   const theme = useTheme();
   if (!active || !payload?.length) return null;
   return (

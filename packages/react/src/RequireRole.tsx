@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { ReactElement, ReactNode } from "react";
 import { Box, Paper, Typography } from "@mui/material";
 import { LockOutlined as LockIcon } from "@mui/icons-material";
 
@@ -47,7 +47,7 @@ export function RequireRole({
   children,
   deniedTitle = "You don't have access to this page",
   deniedBody = "Your account doesn't have the role required to view this page. If you think this is a mistake, ask a tenant admin to grant the right membership role.",
-}: RequireRoleProps): JSX.Element {
+}: RequireRoleProps): ReactElement {
   // global_admin is the cross-tenant operator and satisfies every gate —
   // mirrors the server-side @RequireRole semantics.
   const granted =

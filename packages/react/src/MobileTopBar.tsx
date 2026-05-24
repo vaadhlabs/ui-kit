@@ -1,4 +1,4 @@
-import { type ReactNode } from "react";
+import { type ReactElement, type ReactNode } from "react";
 import { Box, IconButton, Badge } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import {
@@ -41,7 +41,7 @@ export function MobileTopBar({
   onMenu,
   onAlerts,
   logoSlot,
-}: MobileTopBarProps): JSX.Element {
+}: MobileTopBarProps): ReactElement {
   const theme = useTheme();
   const isDark = theme.palette.mode === "dark";
   const b = theme.palette.brand;

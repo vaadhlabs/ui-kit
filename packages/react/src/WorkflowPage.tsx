@@ -3,6 +3,7 @@ import {
   useEffect,
   useRef,
   useState,
+  type ReactElement,
   type ReactNode,
 } from "react";
 import { Box, ButtonBase } from "@mui/material";
@@ -52,7 +53,7 @@ export function WorkflowPage({
   tocItems,
   children,
   onTocClick,
-}: WorkflowPageProps): JSX.Element {
+}: WorkflowPageProps): ReactElement {
   const theme = useTheme();
   const isDark = theme.palette.mode === "dark";
   const brand = theme.palette.brand;

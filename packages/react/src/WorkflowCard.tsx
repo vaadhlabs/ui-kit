@@ -2,6 +2,7 @@ import {
   useEffect,
   useRef,
   useState,
+  type ReactElement,
   type ReactNode,
 } from "react";
 import { Box } from "@mui/material";
@@ -58,7 +59,7 @@ export function WorkflowCard({
   status,
   focus = false,
   children,
-}: WorkflowCardProps): JSX.Element {
+}: WorkflowCardProps): ReactElement {
   const theme = useTheme();
 
   // ringVisible tracks whether the focus-ring glow is at full opacity.
@@ -120,7 +121,7 @@ export function WorkflowCard({
           overflow: "hidden",
           bgcolor: "background.paper",
           border: `1px solid ${theme.palette.divider}`,
-          borderRadius: `${theme.shape.borderRadius * 1.5}px`,
+          borderRadius: `${Number(theme.shape.borderRadius) * 1.5}px`,
           padding: "22px",
           // Smooth focus ring transition
           transition: [

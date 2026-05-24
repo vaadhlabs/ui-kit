@@ -1,4 +1,4 @@
-import { useEffect, useRef, type ComponentType, type ReactNode } from "react";
+import { useEffect, useRef, type ComponentType, type ReactElement, type ReactNode } from "react";
 import { Box, ButtonBase, IconButton, Tooltip } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import {
@@ -78,7 +78,7 @@ export function MobileDrawer({
   onEnvClick,
   onUserSettingsClick,
   logoSlot,
-}: MobileDrawerProps): JSX.Element {
+}: MobileDrawerProps): ReactElement {
   const theme = useTheme();
   const isDark = theme.palette.mode === "dark";
   const b = theme.palette.brand;

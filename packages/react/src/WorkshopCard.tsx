@@ -1,5 +1,5 @@
 import { Box, Card, useTheme, type CardProps } from "@mui/material";
-import type { ReactNode } from "react";
+import type { ReactElement, ReactNode } from "react";
 
 /**
  * Drop-in replacement for `<Card>` with the flat-card chrome pattern
@@ -34,7 +34,7 @@ export interface WorkshopCardProps extends CardProps {
   plain?: boolean;
 }
 
-export function WorkshopCard({ children, plain: _plain, sx, ...rest }: WorkshopCardProps): JSX.Element {
+export function WorkshopCard({ children, plain: _plain, sx, ...rest }: WorkshopCardProps): ReactElement {
   const theme = useTheme();
   return (
     <Card
@@ -44,7 +44,7 @@ export function WorkshopCard({ children, plain: _plain, sx, ...rest }: WorkshopC
         overflow: "hidden",
         background: theme.palette.background.paper,
         border: `1px solid ${theme.palette.divider}`,
-        borderRadius: `${theme.shape.borderRadius * 1.25}px`,
+        borderRadius: `${Number(theme.shape.borderRadius) * 1.25}px`,
         boxShadow: "none",
         ...(sx ?? {}),
       }}

@@ -1,3 +1,4 @@
+import type { ReactElement } from "react";
 import { useTheme } from "@mui/material/styles";
 import { Box, type SxProps, type Theme } from "@mui/material";
 
@@ -41,7 +42,7 @@ function useBadgeColors(kind: StatusBadgeKind, isDark: boolean): BadgeColors {
   }
 }
 
-export function StatusBadge({ kind, text }: StatusBadgeProps): JSX.Element {
+export function StatusBadge({ kind, text }: StatusBadgeProps): ReactElement {
   const theme = useTheme();
   const isDark = theme.palette.mode === "dark";
   const { bg, fg } = useBadgeColors(kind, isDark);

@@ -1,4 +1,4 @@
-import { type ReactNode } from "react";
+import { type ReactElement, type ReactNode } from "react";
 import {
   Box,
   Paper,
@@ -100,7 +100,7 @@ export function DataTable<Row>({
   mobileCard,
   mobileBreakpoint = "sm",
   stickyFirstColumn,
-}: DataTableProps<Row>): JSX.Element {
+}: DataTableProps<Row>): ReactElement {
   if (error) {
     return (
       <Paper sx={{ p: 3 }}>

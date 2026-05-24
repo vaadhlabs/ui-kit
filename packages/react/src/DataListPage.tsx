@@ -1,5 +1,5 @@
 import { Box, Typography, type BoxProps } from "@mui/material";
-import { type ReactNode } from "react";
+import { type ReactElement, type ReactNode } from "react";
 
 export interface DataListPageProps extends Omit<BoxProps, "title"> {
   title: string;
@@ -21,7 +21,7 @@ export function DataListPage({
   children,
   sx,
   ...rest
-}: DataListPageProps): JSX.Element {
+}: DataListPageProps): ReactElement {
   return (
     <Box {...rest} sx={sx}>
       <Box sx={{ mb: 3, display: "flex", alignItems: "center", gap: 2 }}>

@@ -1,4 +1,4 @@
-import { createContext, useContext, type ReactNode } from "react";
+import { createContext, useContext, type ReactElement, type ReactNode } from "react";
 import { useTheme } from "@mui/material/styles";
 import type { Section } from "./workshop-theme.js";
 
@@ -31,7 +31,7 @@ export interface SectionProviderProps {
   children: ReactNode;
 }
 
-export function SectionProvider({ section, children }: SectionProviderProps): JSX.Element {
+export function SectionProvider({ section, children }: SectionProviderProps): ReactElement {
   return <SectionContext.Provider value={section}>{children}</SectionContext.Provider>;
 }
 

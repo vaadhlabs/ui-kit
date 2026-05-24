@@ -1,4 +1,5 @@
 import { Box, Card, CardContent, Typography, useTheme } from "@mui/material";
+import type { ReactElement } from "react";
 import { useSection } from "./section.js";
 
 /**
@@ -39,7 +40,7 @@ export function MetricCardWorkshop({
   caption,
   delta,
   tone = "neutral",
-}: MetricCardWorkshopProps): JSX.Element {
+}: MetricCardWorkshopProps): ReactElement {
   const { accent } = useSection();
   const theme = useTheme();
   const isDark = theme.palette.mode === "dark";

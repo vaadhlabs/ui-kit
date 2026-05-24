@@ -23,7 +23,7 @@ export interface MetricCardProps {
  * KPI card — ported from apps/gpu-dashboard-frontend/src/components/MetricCard.jsx.
  * Title (overline) / big value / optional subtitle, with a coloured icon badge.
  */
-export function MetricCard({ title, value, icon, color = "primary", subtitle }: MetricCardProps): JSX.Element {
+export function MetricCard({ title, value, icon, color = "primary", subtitle }: MetricCardProps): ReactElement {
   const theme = useTheme();
   const colorValue = color.startsWith("#") ? color : COLOR_MAP[color] ?? COLOR_MAP.primary;
   const isDark = theme.palette.mode === "dark";

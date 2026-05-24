@@ -1,4 +1,4 @@
-import { type ReactNode } from "react";
+import { type ReactElement, type ReactNode } from "react";
 import {
   Box,
   Dialog,
@@ -43,7 +43,7 @@ export function RowDetailsDialog<Row>({
   onClose,
   title = "Details",
   subheader,
-}: RowDetailsDialogProps<Row>): JSX.Element {
+}: RowDetailsDialogProps<Row>): ReactElement {
   return (
     <Dialog
       open={row !== null}
