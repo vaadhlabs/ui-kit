@@ -29,3 +29,10 @@ export * from "./RowPreviewDrawer.js";
 // CMS-driven sections for landing pages and product overviews.
 // See marketing/index.ts for the per-component map.
 export * from "./marketing/index.js";
+
+// v2 blueprint primitives (W1-2, 2026-05-24) — architectural-drawing
+// vocabulary for the 5-surface IA. Hairline ink on warm vellum, single
+// signal accent, no rounded corners. Ships alongside Workshop primitives
+// in 1.0.0; Workshop sunsets in 2.0.0 after MFs migrate.
+// See blueprint/index.ts for the per-component map.
+export * from "./blueprint/index.js";

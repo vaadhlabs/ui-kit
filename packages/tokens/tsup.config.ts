@@ -7,6 +7,7 @@ export default defineConfig({
     'src/tone.ts',
     'src/typography.ts',
     'src/css-vars.ts',
+    'src/blueprint.ts',
   ],
   format: ['esm', 'cjs'],
   dts: true,

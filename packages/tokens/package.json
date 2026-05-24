@@ -1,6 +1,6 @@
 {
   "name": "@tensorcost/tokens",
-  "version": "0.2.0",
+  "version": "1.0.0-alpha.0",
   "type": "module",
   "license": "Apache-2.0",
   "main": "./dist/index.js",
@@ -32,7 +32,12 @@
       "import": "./dist/css-vars.js",
       "require": "./dist/css-vars.cjs"
     },
-    "./brand.json": "./src/brand.json"
+    "./brand.json": "./src/brand.json",
+    "./blueprint": {
+      "types": "./dist/blueprint.d.ts",
+      "import": "./dist/blueprint.js",
+      "require": "./dist/blueprint.cjs"
+    }
   },
   "repository": {
     "type": "git",
