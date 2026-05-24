@@ -8,6 +8,10 @@
     "build-storybook": "storybook build"
   },
   "dependencies": {
+    "@emotion/react": "^11.13.0",
+    "@emotion/styled": "^11.13.0",
+    "@mui/material": "^5.16.0",
+    "@tensorcost/tokens": "workspace:*",
     "@tensorcost/ui-kit": "workspace:*"
   },
   "devDependencies": {
