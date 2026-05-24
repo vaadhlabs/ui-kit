@@ -24,3 +24,8 @@ export * from "./RailSidebar.js";
 export * from "./MobileTopBar.js";
 export * from "./MobileDrawer.js";
 export * from "./RowPreviewDrawer.js";
+
+// Marketing primitives (Phase 3a, 2026-05-24) — ported from @tensorcost/component-library
+// CMS-driven sections for landing pages and product overviews.
+// See marketing/index.ts for the per-component map.
+export * from "./marketing/index.js";
