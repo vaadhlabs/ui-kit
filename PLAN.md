@@ -68,7 +68,7 @@ regressions). `pnpm typecheck` and `pnpm build` clean across the workspace.
 
 ---
 
-## Phase 2 — MUI 7 migration
+## Phase 2 — MUI 7 migration ✓ done 2026-05-24
 
 **Scope.** Bump `@mui/material` and `@mui/icons-material` peerDependencies from `^5.16`
 to `^7.x`. Audit every component for the known MUI 6→7 breaking changes (Grid v2,
@@ -80,6 +80,45 @@ styled changes). Update tests and fix TypeScript errors.
 
 **Definition of done.** All tests pass against MUI 7 devDependencies. No `any` casts
 added to work around the bump. TypeScript strict mode clean.
+
+**What landed.**
+
+peerDep bumps: `@mui/material ^5.16.0 → ^7.0.0`, `@mui/icons-material ^5.16.0 → ^7.0.0`,
+`@emotion/react ^11.13.0 → ^11.14.0`, `@emotion/styled ^11.13.0 → ^11.14.0`. Both
+peerDependencies and devDependencies updated in `packages/react/package.json`. Storybook
+app aligned to `@mui/material ^7` and `@emotion/* ^11.14`. MUI 7 ships React 19 type
+definitions; runtime works fine with React 18 — no React version bump required.
+
+JSX.Element sweep: 19 sites across 15 files replaced with `ReactElement` from "react".
+`import type { ReactElement } from "react"` added where not already present. Option B
+chosen over Option A (JSX namespace import) — MetricCard.tsx already used ReactElement,
+so this is consistent with existing codebase convention.
+
+Two sites missed by the audit: `theme.shape.borderRadius * 1.5` in `WorkflowCard.tsx`
+and `theme.shape.borderRadius * 1.25` in `WorkshopCard.tsx` — MUI 7 widened
+`shape.borderRadius` to `number | string`, making arithmetic a TS error. Fixed with
+`Number(theme.shape.borderRadius)` wrappers. No `any` casts used.
+
+`useMediaQuery { noSsr: true }` removed from `ThemeShellProvider.tsx`. The consuming
+apps are CSR-only; the default behavior is fine.
+
+`"@import"` key removed from `MuiCssBaseline.styleOverrides` in `theme.ts`. MUI 7
+silently drops that undocumented key — the font stops loading in production with no
+build error. Replaced with a comment block directing consumers to load JetBrains Mono
+themselves. Documented in the README "Consumer setup" section (new subsection) and
+wired up in `apps/storybook/.storybook/preview-head.html` so stories render the font.
+
+Palette augmentations in `theme.ts` (brand) and `workshop-theme.ts` (workshop) verified
+clean against v7 types — both are open-interface additions on field names MUI 7 doesn't
+use natively. No changes required.
+
+Test results: 252 passed (51 tokens + 201 react), all green, no regressions.
+`pnpm build` exits 0. `pnpm build-storybook` exits 0. Storybook smoke-boot confirmed on
+port 6007 ("Storybook 8.6.18 for react-vite started").
+
+Deviations from brief:
+- Two additional `theme.shape.borderRadius` arithmetic sites fixed (not in audit).
+- Effort: ~1.5h actual vs 4–6h estimated.
 
 ---
 
