@@ -62,7 +62,7 @@ export const Default: Story = {
   args: {
     title: "Everything you need to control AI costs",
     subtitle:
-      "TensorCost gives platform teams a single pane for visibility, guardrails, and optimization across every LLM provider.",
+      "Acme gives platform teams a single pane for visibility, guardrails, and optimization across every service provider.",
     columns: 3,
     features: SAMPLE_FEATURES,
   },

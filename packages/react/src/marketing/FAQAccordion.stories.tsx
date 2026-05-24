@@ -14,30 +14,35 @@ type Story = StoryObj<typeof FAQAccordion>;
 const ITEMS = [
   {
     id: 1,
-    question: "How does TensorCost route my API calls?",
-    answer: "<p>TensorCost intercepts each call and evaluates the prompt against your configured latency and quality SLA. It then routes to the cheapest model that satisfies both constraints.</p>",
+    question: "How does Acme integrate with my existing tools?",
+    answer: "<p>Acme connects via OAuth or API key to the services you already use. Setup takes about five minutes and requires no changes to your existing code or infrastructure.</p>",
   },
   {
     id: 2,
-    question: "Which LLM providers are supported?",
-    answer: "<p>OpenAI, Anthropic, Mistral, Cohere, and any OpenAI-compatible endpoint. More providers are added monthly.</p>",
+    question: "Which plans include team collaboration features?",
+    answer: "<p>All paid plans support unlimited team members, shared workspaces, and role-based access. The free tier is limited to a single user.</p>",
   },
   {
     id: 3,
     question: "How is my data kept private?",
-    answer: "<p>TensorCost processes metadata (token count, model, latency) — never the content of your prompts or completions. All metadata is encrypted in transit and at rest.</p>",
+    answer: "<p>Acme processes only the metadata needed to run your workflows — never the raw content of your files or messages. All data is encrypted in transit and at rest.</p>",
   },
   {
     id: 4,
-    question: "Can I override routing for specific endpoints?",
-    answer: "<p>Yes. You can pin any endpoint to a specific model or provider via routing rules in the dashboard.</p>",
+    question: "Can I cancel at any time?",
+    answer: "<p>Yes. You can cancel your subscription from the billing settings page. Your data is available for export for 30 days after cancellation.</p>",
+  },
+  {
+    id: 5,
+    question: "Is there an on-premise or self-hosted option?",
+    answer: "<p>Self-hosted deployments are available on the Enterprise plan. Contact us for a scoping call.</p>",
   },
 ];
 
 export const Default: Story = {
   args: {
     title: "Frequently asked questions",
-    subtitle: "Still have questions? Email us at support@tensorcost.com.",
+    subtitle: "Still have questions? Email us at support@example.com.",
     items: ITEMS,
   },
 };

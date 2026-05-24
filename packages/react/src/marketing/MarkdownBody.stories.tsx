@@ -13,17 +13,17 @@ export default meta;
 type Story = StoryObj<typeof MarkdownBody>;
 
 const SAMPLE_MD = `
-## Why TensorCost
+## Why Acme
 
-TensorCost routes each inference call to **the cheapest model** that meets your latency SLA.
+Acme automates the repetitive parts of your workflow so your team can **ship faster** without adding headcount.
 
-- No code changes required
-- Works with OpenAI, Anthropic, Mistral, and self-hosted models
-- Savings verified on-chain via [SHA-256 ledger](https://tensorcost.com/proof)
+- No infrastructure changes required
+- Integrates with the tools you already use
+- Full audit trail available via [the reporting dashboard](https://example.com/reports)
 
 ### Getting started
 
-Run \`npm install @tensorcost/sdk\` then call \`tc.complete()\` instead of \`openai.chat.completions.create()\`.
+Run \`npm install @acme/sdk\` then call \`acme.run()\` instead of wiring up each integration by hand.
 `;
 
 export const Default: Story = {
@@ -32,7 +32,7 @@ export const Default: Story = {
 
 export const WithCustomLinkColor: Story = {
   args: {
-    children: "Visit [our docs](https://tensorcost.com/docs) for more detail.",
+    children: "Visit [our docs](https://example.com/docs) for more detail.",
     components: {
       a: ({ node: _node, ...p }: Record<string, unknown>) => (
         <a

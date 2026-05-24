@@ -13,12 +13,12 @@ type Story = StoryObj<typeof MarketingHero>;
 
 export const Gradient: Story = {
   args: {
-    eyebrow: "Intelligent model routing",
-    title: "Stop overpaying for LLM inference",
-    subtitle: "TensorCost routes every API call to the cheapest model that meets your SLA — automatically.",
+    eyebrow: "Workflow automation",
+    title: "Stop doing the boring parts manually",
+    subtitle: "Acme automates the repetitive work so your team can focus on what actually matters.",
     cta: { text: "Get started free", link: "#", style: "primary" },
     secondaryCta: { text: "Read the docs", link: "#", style: "outline" },
-    trustLine: "No credit card required · 5-minute integration",
+    trustLine: "No credit card required · 5-minute setup",
     variant: "gradient",
   },
 };
@@ -27,16 +27,16 @@ export const Dark: Story = {
   args: {
     eyebrow: "For engineering teams",
     title: "Full audit trail. Zero vendor lock-in.",
-    subtitle: "Every routing decision is logged and hashed.",
-    cta: { text: "Start saving", link: "#" },
+    subtitle: "Every action is logged and attributable.",
+    cta: { text: "Start free trial", link: "#" },
     variant: "dark",
   },
 };
 
 export const Light: Story = {
   args: {
-    title: "The fastest way to cut LLM costs",
-    subtitle: "Works with OpenAI, Anthropic, Mistral, and self-hosted models.",
+    title: "The fastest way to ship reliable software",
+    subtitle: "Works with GitHub, GitLab, Bitbucket, and self-hosted repos.",
     cta: { text: "Get started", link: "#" },
     variant: "light",
     alignment: "left",

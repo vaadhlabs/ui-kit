@@ -15,17 +15,17 @@ const TABS = [
   {
     label: "Overview",
     icon: "LineChart",
-    content: `## How savings work\n\nTensorCost intercepts every API call and picks the cheapest model that meets your SLA.\n\n- **No code changes** — just swap the base URL.\n- Savings verified via on-chain ledger.`,
+    content: `## How it works\n\nAcme automates your workflow and routes each task to the right service at the lowest cost.\n\n- **No code changes** — just point at the proxy endpoint.\n- Every action is logged with a tamper-evident audit trail.`,
   },
   {
     label: "Integration",
     icon: "Code",
-    content: `## Quick start\n\n\`\`\`bash\nnpm install @tensorcost/sdk\n\`\`\`\n\nThen replace \`openai.baseURL\` with \`api.tensorcost.com/v1\`.`,
+    content: `## Quick start\n\n\`\`\`bash\nnpm install @acme/sdk\n\`\`\`\n\nThen replace your service base URL with \`api.example.com/v1\`.`,
   },
   {
     label: "Reporting",
     icon: "cfo",
-    content: `## CFO dashboard\n\nEvery routing decision is logged with the cost delta, model used, and a SHA-256 hash of the response.`,
+    content: `## Reporting dashboard\n\nEvery action is logged with a timestamp, cost delta, and a SHA-256 hash for independent verification.`,
   },
 ];
 

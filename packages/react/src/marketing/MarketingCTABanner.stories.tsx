@@ -13,7 +13,7 @@ type Story = StoryObj<typeof MarketingCTABanner>;
 
 export const Default: Story = {
   args: {
-    title: "Start saving on LLM costs today",
+    title: "Start saving time and money today",
     subtitle: "No credit card required. 5-minute setup.",
     button: { text: "Get started free", link: "/signup" },
   },
@@ -21,8 +21,8 @@ export const Default: Story = {
 
 export const Gradient: Story = {
   args: {
-    title: "Cut your inference bill by up to 60%",
-    subtitle: "TensorCost routes every call to the cheapest model that meets your SLA.",
+    title: "Save up to 50% on your operational costs",
+    subtitle: "Acme automates the work that shouldn't need a human in the loop.",
     button: { text: "Start free trial", link: "/signup", style: "secondary" },
     gradientFrom: "#6366F1",
     gradientTo: "#0EA5E9",

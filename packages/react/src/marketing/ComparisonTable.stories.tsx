@@ -36,10 +36,10 @@ const ROWS = [
 
 export const Default: Story = {
   args: {
-    title: "Before and after TensorCost",
-    subtitle: "A two-week pilot typically surfaces 20–40% of wasted AI spend.",
-    leftLabel: "Without TensorCost",
-    rightLabel: "With TensorCost",
+    title: "Before and after Acme",
+    subtitle: "A two-week pilot typically surfaces 20–40% of unnecessary spend.",
+    leftLabel: "Without Acme",
+    rightLabel: "With Acme",
     rows: ROWS,
   },
 };

@@ -15,7 +15,7 @@ export const Default: Story = {
   args: {
     badge: "30-Day Money-Back Guarantee",
     title: "Risk-free pilot",
-    body: "If TensorCost doesn't find at least 15% wasted AI spend in your first 30 days, we'll refund your subscription in full. No questions asked.",
+    body: "If Acme doesn't save your team at least 15% of wasted time or spend in your first 30 days, we'll refund your subscription in full. No questions asked.",
   },
 };
 

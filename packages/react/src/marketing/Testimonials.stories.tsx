@@ -14,7 +14,7 @@ type Story = StoryObj<typeof Testimonials>;
 const ITEMS = [
   {
     id: 1,
-    quote: "TensorCost cut our monthly inference bill by 52% in the first week. The SHA-256 ledger gives our CFO exactly the audit trail they needed.",
+    quote: "Acme reduced our monthly spend by 40% in the first two weeks. The audit trail gives our finance team exactly the visibility they were asking for.",
     authorName: "Sarah Chen",
     authorTitle: "VP Engineering",
     authorCompany: "Luminary AI",
@@ -22,7 +22,7 @@ const ITEMS = [
   },
   {
     id: 2,
-    quote: "We were spending $40k/month on GPT-4 calls that didn't need GPT-4. TensorCost figured that out automatically.",
+    quote: "We were paying for work that didn't need a premium service. Acme figured that out automatically and rerouted it.",
     authorName: "Marcus Webb",
     authorTitle: "CTO",
     authorCompany: "Nexus Data",
@@ -32,7 +32,7 @@ const ITEMS = [
     id: 3,
     quote: "Integration took 15 minutes. We just changed one environment variable.",
     authorName: "Priya Nair",
-    authorTitle: "Lead ML Engineer",
+    authorTitle: "Lead Engineer",
     authorCompany: "Orbit Labs",
     rating: 4,
   },

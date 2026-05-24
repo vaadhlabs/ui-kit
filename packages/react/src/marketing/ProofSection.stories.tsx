@@ -14,21 +14,21 @@ type Story = StoryObj<typeof ProofSection>;
 export const Default: Story = {
   args: {
     title: "Verify it yourself.",
-    body: "Every saving is published as a SHA-256 hash of the routing ledger. Run the command on the left to confirm our numbers match yours.\n\nSee [the verification guide](https://tensorcost.com/proof) for a full walkthrough.",
+    body: "Every audit report is published as a SHA-256 hash of the underlying data export. Run the command on the left to confirm our numbers match yours.\n\nSee [the verification guide](https://example.com/proof) for a full walkthrough.",
     ctaText: "Read the guide",
-    ctaLink: "https://tensorcost.com/proof",
-    command: "$ sha256sum savings-ledger.csv",
-    output: "a3f2c9b88e1d4f6a9c0b5d8e72f1a4b6c8d9e0f12  savings-ledger.csv",
+    ctaLink: "https://example.com/proof",
+    command: "$ sha256sum audit-report.csv",
+    output: "a3f2c9b88e1d4f6a9c0b5d8e72f1a4b6c8d9e0f12  audit-report.csv",
   },
 };
 
 export const Stacked: Story = {
   args: {
     title: "Zero trust required.",
-    body: "We publish every ledger hash publicly. Check it yourself.",
+    body: "We publish every audit hash publicly. Check it yourself.",
     variant: "stacked",
-    ctaText: "View public ledger",
-    ctaLink: "https://tensorcost.com/ledger",
+    ctaText: "View public audit log",
+    ctaLink: "https://example.com/audit",
   },
 };
 

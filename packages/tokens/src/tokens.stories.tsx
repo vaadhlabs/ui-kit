@@ -77,7 +77,7 @@ function TokensOverview() {
   return (
     <div style={{ padding: '24px 32px', fontFamily: "'Inter', system-ui, sans-serif", maxWidth: 900 }}>
       <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 4, color: '#0F172A' }}>
-        TensorCost Design Tokens
+        Design Tokens
       </h2>
       <p style={{ fontSize: 13, color: '#64748B', marginBottom: 32, marginTop: 0 }}>
         Visual reference for <code>@tensorcost/tokens</code>. Use the toolbar light/dark toggle
@@ -117,11 +117,11 @@ function TokensOverview() {
       <div style={{ marginBottom: 24 }}>
         {(
           [
-            { key: 'h4',      style: { ...TYPOGRAPHY_TOKENS.h4,       fontFamily: TYPOGRAPHY_TOKENS.fontFamily }, text: 'TensorCost — h4 heading' },
-            { key: 'h5',      style: { ...TYPOGRAPHY_TOKENS.h5,       fontFamily: TYPOGRAPHY_TOKENS.fontFamily }, text: 'GPU cost breakdown — h5 heading' },
+            { key: 'h4',      style: { ...TYPOGRAPHY_TOKENS.h4,       fontFamily: TYPOGRAPHY_TOKENS.fontFamily }, text: 'Acme Platform — h4 heading' },
+            { key: 'h5',      style: { ...TYPOGRAPHY_TOKENS.h5,       fontFamily: TYPOGRAPHY_TOKENS.fontFamily }, text: 'Usage breakdown — h5 heading' },
             { key: 'h6',      style: { ...TYPOGRAPHY_TOKENS.h6,       fontFamily: TYPOGRAPHY_TOKENS.fontFamily }, text: 'Last 30 days — h6 heading' },
             { key: 'overline',style: { ...TYPOGRAPHY_TOKENS.overline, fontFamily: TYPOGRAPHY_TOKENS.fontFamily, textTransform: 'uppercase' as const }, text: 'SECTION LABEL — overline' },
-            { key: 'button',  style: { fontWeight: TYPOGRAPHY_TOKENS.button.fontWeight, fontSize: '0.8125rem', fontFamily: TYPOGRAPHY_TOKENS.fontFamily }, text: 'Optimize spend — button' },
+            { key: 'button',  style: { fontWeight: TYPOGRAPHY_TOKENS.button.fontWeight, fontSize: '0.8125rem', fontFamily: TYPOGRAPHY_TOKENS.fontFamily }, text: 'Get started — button' },
           ] as const
         ).map(({ key, style, text }) => (
           <div key={key} style={{ marginBottom: 12 }}>

@@ -21,7 +21,7 @@ const STATS = [
 export const Default: Story = {
   args: {
     title: "Proven at scale",
-    subtitle: "Numbers from production TensorCost deployments.",
+    subtitle: "Numbers from production deployments.",
     stats: STATS,
     animateOnScroll: false,
   },
