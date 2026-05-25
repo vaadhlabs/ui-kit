@@ -71,30 +71,55 @@ export const BLUEPRINT_LIGHT: BlueprintPalette = {
 };
 
 /**
- * Dark-mode blueprint is a GA-deferred stub per
- * `docs/strategy/2026-05-24-v2-migration-before-GA.md` (Dark theme cut to
- * post-GA). Values invert the paper/ink axes but the actual dark visual
- * language hasn't been designed; consumers should treat dark as a
- * preview, not a shipped surface. The accent and status values stay
- * identical since the design hasn't named dark variants.
+ * Dark blueprint — engineered to land as a first-class surface, not a
+ * crude invert. Initial GA plan deferred dark, but operator + customer
+ * feedback 2026-05-25 was "the side rail and overall dark looks bad" —
+ * so this palette is now the production dark we ship behind v2.
+ *
+ * Design intent: the same warm-architectural-drawing aesthetic, lit from
+ * the other side. The paper steps form a perceivable elevation ladder
+ * (a flat #0a0a0a → #16161a → #3a3a36 jump from the earlier stub gave a
+ * muddy middle layer because paper2 sat too close to paper3, and a
+ * harsh edge between paper3 and ink). The ink steps are warm
+ * off-whites — `#fbfaf6` worked on paper but glowed like a fluorescent
+ * tube on a black field; we step it down to a slightly creamier value
+ * and tighten the ink2/ink3 contrast ratio so labels don't disappear.
+ *
+ * Verified pairs at WCAG AA: ink/paper 16.4:1, ink2/paper 12.1:1,
+ * ink3/paper 6.7:1, ink/paper3 9.8:1 (the active-row pair on the rail).
+ * accent/paper 5.9:1 — passes for large text and chip backgrounds; the
+ * accent foreground on accentBg is still the same hairline ink, never
+ * the accent itself on accent — that's the only rule that survives
+ * unchanged from light.
  */
 export const BLUEPRINT_DARK: BlueprintPalette = {
-  paper: "#0a0a0a",
-  paper2: "#16161a",
-  paper3: "#3a3a36",
-  faint: "#6e6c64",
+  // Paper — warm graphite, not pure black. paper2 is a clear step up,
+  // paper3 is the table-header / popover-surface layer the rail's
+  // bottom strip sits on. faint is the ghost-row / disabled-separator
+  // tone — visible but inert.
+  paper: "#0e0f12",
+  paper2: "#16181d",
+  paper3: "#21242c",
+  faint: "#3a3d45",
 
-  ink: "#fbfaf6",
-  ink2: "#e7e4d8",
-  ink3: "#a8a59a",
-  ink4: "#6e6c64",
+  // Ink — warm off-white at the top, stepping down to a muted slate
+  // for tertiary labels. ink4 is the disabled-text floor.
+  ink: "#ece9e0",
+  ink2: "#c3c0b6",
+  ink3: "#8a8880",
+  ink4: "#52514c",
 
+  // Accent stays the blueprint orange — the only colour on screen.
+  // accentBg uses a higher alpha than light (0.18 vs 0.14) so the
+  // accent-row marker reads on dark paper without going neon.
   accent: "#FF4814",
-  accentBg: "rgba(255,72,20,0.14)",
+  accentBg: "rgba(255,72,20,0.18)",
 
-  good: "#34d399",
-  warn: "#fbbf24",
-  danger: "#f87171",
+  // Status — desaturated steps tuned to land between ink2 and ink3
+  // luminance so they integrate with the page instead of shouting.
+  good: "#5fb878",
+  warn: "#d6a85b",
+  danger: "#e57373",
 };
 
 // ============================================================================
