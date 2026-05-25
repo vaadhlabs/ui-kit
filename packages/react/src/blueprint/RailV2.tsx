@@ -47,6 +47,13 @@ export interface RailV2Props {
   environment?: string;
   /** Click handler for the tenant chip. */
   onTenantClick?: () => void;
+  /**
+   * Click handler for the environment line. When supplied, the env row
+   * becomes its own clickable button (so a multi-tenant user can open
+   * the environment picker without triggering the tenant picker). When
+   * omitted, the env line renders as static text.
+   */
+  onEnvClick?: () => void;
 
   /** Word-mark / logo slot. Replaces the default text "tensorcost" lockup. */
   logoSlot?: ReactNode;
@@ -66,6 +73,7 @@ export function RailV2({
   tenant,
   environment,
   onTenantClick,
+  onEnvClick,
   logoSlot,
   versionLabel,
   width = 240,
@@ -211,51 +219,88 @@ export function RailV2({
         })}
       </ul>
 
-      {/* Tenant strip — pinned bottom */}
+      {/* Tenant + env strip — pinned bottom. Two separately-clickable
+          buttons when both handlers are supplied (multi-tenant case);
+          otherwise the env line stays a static span (single-tenant). */}
       {tenant && (
-        <button
-          type="button"
-          onClick={onTenantClick}
-          aria-label={`Tenant ${tenant}${environment ? ` · ${environment}` : ""}`}
+        <div
           style={{
             padding: "12px 20px",
-            borderTop: `1px solid ${p.ink}`,
-            border: "none",
             borderTopWidth: 1,
             borderTopStyle: "solid",
             borderTopColor: p.ink,
             background: p.paper2,
             color: p.ink,
-            textAlign: "left",
-            cursor: onTenantClick ? "pointer" : "default",
-            font: "inherit",
           }}
         >
-          <span
+          <button
+            type="button"
+            onClick={onTenantClick}
+            aria-label={`Tenant ${tenant}`}
             style={{
-              fontFamily: BLUEPRINT_FAMILIES.mono,
-              fontSize: 9,
-              color: p.ink3,
-              letterSpacing: "0.14em",
-              textTransform: "uppercase",
+              all: "unset",
               display: "block",
-              marginBottom: 4,
+              width: "100%",
+              cursor: onTenantClick ? "pointer" : "default",
+              textAlign: "left",
             }}
           >
-            Tenant
-          </span>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            <span style={{ fontFamily: BLUEPRINT_FAMILIES.body, fontSize: 13, fontWeight: 500 }}>
-              {tenant}
-            </span>
             <span
-              aria-hidden
-              style={{ fontFamily: BLUEPRINT_FAMILIES.mono, fontSize: 10, color: p.ink3 }}
+              style={{
+                fontFamily: BLUEPRINT_FAMILIES.mono,
+                fontSize: 9,
+                color: p.ink3,
+                letterSpacing: "0.14em",
+                textTransform: "uppercase",
+                display: "block",
+                marginBottom: 4,
+              }}
             >
-              ↕
+              Tenant
             </span>
-          </div>
-          {environment && (
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              <span style={{ fontFamily: BLUEPRINT_FAMILIES.body, fontSize: 13, fontWeight: 500 }}>
+                {tenant}
+              </span>
+              <span
+                aria-hidden
+                style={{ fontFamily: BLUEPRINT_FAMILIES.mono, fontSize: 10, color: p.ink3 }}
+              >
+                ↕
+              </span>
+            </div>
+          </button>
+          {environment && onEnvClick && (
+            <button
+              type="button"
+              onClick={onEnvClick}
+              aria-label={`Environment ${environment}`}
+              style={{
+                all: "unset",
+                display: "flex",
+                alignItems: "center",
+                gap: 6,
+                marginTop: 6,
+                cursor: "pointer",
+                width: "100%",
+              }}
+            >
+              <span
+                aria-hidden
+                style={{ width: 6, height: 6, background: p.accent, display: "inline-block" }}
+              />
+              <span style={{ fontFamily: BLUEPRINT_FAMILIES.mono, fontSize: 10, color: p.ink2 }}>
+                {environment}
+              </span>
+              <span
+                aria-hidden
+                style={{ marginLeft: "auto", fontFamily: BLUEPRINT_FAMILIES.mono, fontSize: 10, color: p.ink3 }}
+              >
+                ↕
+              </span>
+            </button>
+          )}
+          {environment && !onEnvClick && (
             <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 6 }}>
               <span
                 aria-hidden
@@ -266,7 +311,7 @@ export function RailV2({
               </span>
             </div>
           )}
-        </button>
+        </div>
       )}
     </nav>
   );

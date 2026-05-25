@@ -99,12 +99,32 @@ describe("RailV2", () => {
     expect(clicks).toEqual(["money"]);
   });
 
-  it("tenant + environment chip renders with an aria-label", () => {
+  it("tenant + environment render with separate aria-labels when onEnvClick supplied", () => {
     const { getByLabelText } = render(
-      <RailV2 active="router" tenant="Acme AI" environment="prod · eu-west-1" />,
+      <RailV2
+        active="router"
+        tenant="Acme AI"
+        environment="prod · eu-west-1"
+        onTenantClick={vi.fn()}
+        onEnvClick={vi.fn()}
+      />,
     );
-    const chip = getByLabelText(/Tenant Acme AI · prod/);
-    expect(chip).toBeTruthy();
+    expect(getByLabelText(/^Tenant Acme AI$/)).toBeTruthy();
+    expect(getByLabelText(/^Environment prod · eu-west-1$/)).toBeTruthy();
+  });
+
+  it("env row stays a static span when onEnvClick is omitted (single-tenant case)", () => {
+    const { queryByLabelText, getByText } = render(
+      <RailV2
+        active="router"
+        tenant="Acme AI"
+        environment="prod · eu-west-1"
+        onTenantClick={vi.fn()}
+      />,
+    );
+    // The text renders but no Environment-labelled button exists.
+    expect(getByText("prod · eu-west-1")).toBeTruthy();
+    expect(queryByLabelText(/Environment/)).toBeNull();
   });
 
   it("tenant click handler fires", () => {
@@ -114,6 +134,23 @@ describe("RailV2", () => {
     );
     fireEvent.click(getByLabelText(/Tenant Acme AI/));
     expect(onTenantClick).toHaveBeenCalledOnce();
+  });
+
+  it("env click handler fires independently of tenant click", () => {
+    const onTenantClick = vi.fn();
+    const onEnvClick = vi.fn();
+    const { getByLabelText } = render(
+      <RailV2
+        active="router"
+        tenant="Acme AI"
+        environment="prod"
+        onTenantClick={onTenantClick}
+        onEnvClick={onEnvClick}
+      />,
+    );
+    fireEvent.click(getByLabelText(/Environment prod/));
+    expect(onEnvClick).toHaveBeenCalledOnce();
+    expect(onTenantClick).not.toHaveBeenCalled();
   });
 
   it("logoSlot overrides the default word-mark", () => {
