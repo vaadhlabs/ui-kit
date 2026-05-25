@@ -9,7 +9,8 @@
  * a hero number wants 3–6 sibling stats at the same density.
  */
 import type { CSSProperties, ReactNode } from "react";
-import { BLUEPRINT_LIGHT } from "@tensorcost/tokens";
+import type { BlueprintPalette } from "@tensorcost/tokens";
+import { usePalette } from "./ThemeProvider.js";
 import { Eyebrow, Mono, Num } from "./Text.js";
 
 export type DeltaKind = "good" | "warn" | "red" | "neutral";
@@ -34,8 +35,9 @@ export interface StatLineProps {
   className?: string;
 }
 
-function deltaColor(kind: DeltaKind | undefined): string {
-  const p = BLUEPRINT_LIGHT;
+// Palette passed in by the caller — usePalette is a hook and can't
+// be called inside this plain helper without breaking rules-of-hooks.
+function deltaColor(kind: DeltaKind | undefined, p: BlueprintPalette): string {
   switch (kind) {
     case "good":
       return p.good;
@@ -49,7 +51,7 @@ function deltaColor(kind: DeltaKind | undefined): string {
 }
 
 export function StatLine({ items, style, className }: StatLineProps): JSX.Element {
-  const p = BLUEPRINT_LIGHT;
+  const p = usePalette();
   return (
     <div
       className={className}
@@ -87,7 +89,7 @@ export function StatLine({ items, style, className }: StatLineProps): JSX.Elemen
               {it.unit && <Mono size={11} color={p.ink3}>{it.unit}</Mono>}
             </div>
             {it.delta && (
-              <Mono size={10} color={deltaColor(it.deltaKind)}>
+              <Mono size={10} color={deltaColor(it.deltaKind, p)}>
                 {it.delta}
               </Mono>
             )}

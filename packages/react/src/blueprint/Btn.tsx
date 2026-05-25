@@ -13,7 +13,9 @@
  */
 import { forwardRef } from "react";
 import type { ButtonHTMLAttributes, CSSProperties, ReactNode } from "react";
-import { BLUEPRINT_FAMILIES, BLUEPRINT_LIGHT } from "@tensorcost/tokens";
+import { BLUEPRINT_FAMILIES } from "@tensorcost/tokens";
+import type { BlueprintPalette } from "@tensorcost/tokens";
+import { usePalette } from "./ThemeProvider.js";
 
 export type BtnVariant = "default" | "inked" | "accent" | "ghost";
 export type BtnSize = "sm" | "md";
@@ -30,8 +32,7 @@ interface BtnTone {
   bd: string;
 }
 
-function tone(variant: BtnVariant): BtnTone {
-  const p = BLUEPRINT_LIGHT;
+function tone(variant: BtnVariant, p: BlueprintPalette): BtnTone {
   switch (variant) {
     case "default":
       return { bg: p.paper, fg: p.ink, bd: p.ink };
@@ -48,7 +49,8 @@ const Btn = forwardRef<HTMLButtonElement, BtnProps>(function Btn(
   { variant = "default", size = "md", style, children, type = "button", ...rest },
   ref,
 ) {
-  const t = tone(variant);
+  const palette = usePalette();
+  const t = tone(variant, palette);
   const sz = size === "sm" ? { padding: "4px 10px", fontSize: 11 } : { padding: "7px 14px", fontSize: 12 };
   const css: CSSProperties = {
     display: "inline-flex",

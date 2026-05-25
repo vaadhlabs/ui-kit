@@ -12,7 +12,8 @@
  */
 import { forwardRef } from "react";
 import type { CSSProperties, HTMLAttributes, ReactNode } from "react";
-import { BLUEPRINT_LIGHT } from "@tensorcost/tokens";
+import type { BlueprintPalette } from "@tensorcost/tokens";
+import { usePalette } from "./ThemeProvider.js";
 
 export type BoxVariant = "solid" | "soft" | "accent" | "inked" | "ghost";
 
@@ -27,8 +28,12 @@ export interface BoxProps extends Omit<HTMLAttributes<HTMLDivElement>, "color"> 
   children?: ReactNode;
 }
 
-function variantStyle(variant: BoxVariant): CSSProperties {
-  const p = BLUEPRINT_LIGHT;
+// Variants resolved against the active palette so paper/ink swap on
+// dark mode. The function used to capture BLUEPRINT_LIGHT directly,
+// which meant every Box rendered the light palette regardless of
+// theme — the "solid" Box variant on a Money/Policy/etc. page kept
+// painting a vellum-white card in the middle of a dark page.
+function variantStyle(variant: BoxVariant, p: BlueprintPalette): CSSProperties {
   switch (variant) {
     case "solid":
       return { background: p.paper, border: `1px solid ${p.ink}` };
@@ -47,11 +52,12 @@ const Box = forwardRef<HTMLDivElement, BoxProps>(function Box(
   { variant = "solid", w, h, p = 16, style, children, ...rest },
   ref,
 ) {
+  const palette = usePalette();
   return (
     <div
       ref={ref}
       style={{
-        ...variantStyle(variant),
+        ...variantStyle(variant, palette),
         width: w,
         height: h,
         padding: p,

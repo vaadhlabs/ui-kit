@@ -7,7 +7,8 @@
  * body renders as small Body.
  */
 import type { CSSProperties, ReactNode } from "react";
-import { BLUEPRINT_FAMILIES, BLUEPRINT_LIGHT } from "@tensorcost/tokens";
+import { BLUEPRINT_FAMILIES } from "@tensorcost/tokens";
+import { usePalette } from "./ThemeProvider.js";
 import { Callout } from "./Callout.js";
 import { Eyebrow } from "./Text.js";
 
@@ -35,7 +36,7 @@ export function LeaderCallout({
   style,
   className,
 }: LeaderCalloutProps): JSX.Element {
-  const p = BLUEPRINT_LIGHT;
+  const p = usePalette();
   return (
     <div
       className={className}

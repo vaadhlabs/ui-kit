@@ -13,7 +13,8 @@
  * wanting interaction use DataTable from the Workshop kit.
  */
 import type { CSSProperties, ReactNode } from "react";
-import { BLUEPRINT_FAMILIES, BLUEPRINT_LIGHT } from "@tensorcost/tokens";
+import { BLUEPRINT_FAMILIES } from "@tensorcost/tokens";
+import { usePalette } from "./ThemeProvider.js";
 
 export type Align = "left" | "right" | "center";
 
@@ -50,7 +51,7 @@ export function Table({
   style,
   className,
 }: TableProps): JSX.Element {
-  const p = BLUEPRINT_LIGHT;
+  const p = usePalette();
   const tracks = cols.map((c) => c.w ?? "1fr").join(" ");
   return (
     <div

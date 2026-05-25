@@ -12,8 +12,8 @@
  * column in accent to signal "today / latest".
  */
 import type { CSSProperties, ReactNode } from "react";
-import { BLUEPRINT_LIGHT } from "@tensorcost/tokens";
 import { Eyebrow, Mono } from "./Text.js";
+import { usePalette } from "./ThemeProvider.js";
 
 export type PlotKind = "line" | "area" | "bars" | "spark" | "step";
 
@@ -49,8 +49,13 @@ export function Plot({
   style,
   className,
 }: PlotProps): JSX.Element {
-  const p = BLUEPRINT_LIGHT;
-  const ink = color ?? p.ink;
+  // Use the active palette so dark mode draws cream lines on graphite
+  // paper instead of black lines (which would be invisible). The bar
+  // and line strokes default to ink2 rather than ink so the chart reads
+  // as supporting data, not screaming foreground — the user feedback
+  // 2026-05-25 was that ink-on-paper bars looked "too white on dark".
+  const p = usePalette();
+  const ink = color ?? p.ink2;
   const acc = accent ?? p.accent;
   const svgStyle: CSSProperties = {
     display: "block",

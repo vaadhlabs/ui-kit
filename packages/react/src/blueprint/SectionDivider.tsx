@@ -8,7 +8,8 @@
  * eyebrow kicker, large H1 title, optional body paragraph.
  */
 import type { CSSProperties, ReactNode } from "react";
-import { BLUEPRINT_FAMILIES, BLUEPRINT_LIGHT } from "@tensorcost/tokens";
+import { BLUEPRINT_FAMILIES } from "@tensorcost/tokens";
+import { usePalette } from "./ThemeProvider.js";
 import { B, Eyebrow, H1 } from "./Text.js";
 
 export interface SectionDividerProps {
@@ -38,7 +39,7 @@ export function SectionDivider({
   style,
   className,
 }: SectionDividerProps): JSX.Element {
-  const p = BLUEPRINT_LIGHT;
+  const p = usePalette();
   const numberColor = accent ?? p.accent;
   return (
     <div

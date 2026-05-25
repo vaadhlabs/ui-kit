@@ -10,7 +10,9 @@
  * spec-sheet label, not a UI chip.
  */
 import type { CSSProperties, HTMLAttributes, ReactNode } from "react";
-import { BLUEPRINT_FAMILIES, BLUEPRINT_LIGHT } from "@tensorcost/tokens";
+import { BLUEPRINT_FAMILIES } from "@tensorcost/tokens";
+import type { BlueprintPalette } from "@tensorcost/tokens";
+import { usePalette } from "./ThemeProvider.js";
 
 export type TagVariant = "default" | "accent" | "inked" | "good" | "warn" | "red";
 
@@ -25,8 +27,9 @@ interface TagTone {
   bg: string;
 }
 
-function tone(variant: TagVariant): TagTone {
-  const p = BLUEPRINT_LIGHT;
+// Palette passed in as an argument — usePalette is a hook and would
+// violate React's rules-of-hooks if called from this plain helper.
+function tone(variant: TagVariant, p: BlueprintPalette): TagTone {
   switch (variant) {
     case "default":
       return { color: p.ink2, bd: p.ink3, bg: "transparent" };
@@ -49,7 +52,8 @@ export function Tag({
   children,
   ...rest
 }: TagProps): JSX.Element {
-  const t = tone(variant);
+  const palette = usePalette();
+  const t = tone(variant, palette);
   const css: CSSProperties = {
     display: "inline-flex",
     alignItems: "center",

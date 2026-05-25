@@ -18,6 +18,7 @@ import {
   BLUEPRINT_TYPE,
 } from "@tensorcost/tokens";
 import type { BlueprintPalette } from "@tensorcost/tokens";
+import { usePalette } from "./ThemeProvider.js";
 
 type SizeProp = number | string;
 
@@ -43,12 +44,17 @@ export interface EyebrowProps extends CommonProps {
 
 export function Eyebrow({
   children,
-  color = BLUEPRINT_LIGHT.ink3,
+  color,
   size,
   style,
   className,
 }: EyebrowProps): JSX.Element {
   const e = BLUEPRINT_TYPE.eyebrow;
+  // Default to the active palette's ink3 (label-weight). The previous
+  // hardcoded BLUEPRINT_LIGHT.ink3 made every eyebrow render in light-mode
+  // ink even when the surrounding BlueprintThemeProvider was set to dark
+  // — i.e. dark text on dark paper.
+  const p = usePalette();
   return (
     <span
       className={className}
@@ -58,7 +64,7 @@ export function Eyebrow({
         fontWeight: e.fontWeight,
         letterSpacing: e.letterSpacing,
         textTransform: e.textTransform,
-        color,
+        color: color ?? p.ink3,
         ...style,
       }}
     >
@@ -87,13 +93,17 @@ function makeHeading(
 ) {
   return function Heading({
     children,
-    color = BLUEPRINT_LIGHT.ink,
+    color,
     size,
     weight = 500,
     style,
     className,
   }: HeadingProps): JSX.Element {
     const Tag = tag;
+    // Default to active palette's display ink so dark mode actually gets
+    // light text on dark paper. Previously hardcoded BLUEPRINT_LIGHT.ink
+    // rendered the page hero in #0a0a0a regardless of theme.
+    const p = usePalette();
     return (
       <Tag
         className={className}
@@ -104,7 +114,7 @@ function makeHeading(
           lineHeight: defaultLineHeight,
           letterSpacing: defaultLetterSpacing,
           margin: 0,
-          color,
+          color: color ?? p.ink,
           ...style,
         }}
       >
@@ -150,12 +160,13 @@ export interface BodyProps extends CommonProps {
 
 export function Body({
   children,
-  color = BLUEPRINT_LIGHT.ink2,
+  color,
   size,
   weight = 400,
   style,
   className,
 }: BodyProps): JSX.Element {
+  const p = usePalette();
   return (
     <div
       className={className}
@@ -164,7 +175,7 @@ export function Body({
         fontSize: size != null ? px(size) : BLUEPRINT_TYPE.body.fontSize,
         fontWeight: weight,
         lineHeight: BLUEPRINT_TYPE.body.lineHeight,
-        color,
+        color: color ?? p.ink2,
         ...style,
       }}
     >
@@ -189,12 +200,13 @@ export interface MonoProps extends CommonProps {
 
 export function Mono({
   children,
-  color = BLUEPRINT_LIGHT.ink2,
+  color,
   size,
   weight = 500,
   style,
   className,
 }: MonoProps): JSX.Element {
+  const p = usePalette();
   return (
     <span
       className={className}
@@ -204,7 +216,7 @@ export function Mono({
         fontWeight: weight,
         lineHeight: BLUEPRINT_TYPE.mono.lineHeight,
         fontFeatureSettings: '"ss01" on, "tnum" on',
-        color,
+        color: color ?? p.ink2,
         ...style,
       }}
     >
@@ -226,12 +238,16 @@ export interface NumProps extends CommonProps {
 
 export function Num({
   children,
-  color = BLUEPRINT_LIGHT.ink,
+  color,
   size,
   weight = 500,
   style,
   className,
 }: NumProps): JSX.Element {
+  // Bump the dark-mode default weight from 500 to 600 — the cream-on-graphite
+  // ink reads thinner at hero scale (88px+) than the same metric in light;
+  // 600 brings perceived weight back into line. Light keeps 500 (unchanged).
+  const p = usePalette();
   return (
     <span
       className={className}
@@ -242,7 +258,7 @@ export function Num({
         lineHeight: BLUEPRINT_TYPE.num.lineHeight,
         letterSpacing: BLUEPRINT_TYPE.num.letterSpacing,
         fontVariantNumeric: "tabular-nums",
-        color,
+        color: color ?? p.ink,
         ...style,
       }}
     >

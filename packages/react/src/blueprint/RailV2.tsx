@@ -56,6 +56,17 @@ export interface RailV2Props {
    */
   onEnvClick?: () => void;
 
+  /**
+   * Logged-in user — email + role string. Rendered as a chip ABOVE the
+   * tenant strip when present, mirroring the legacy RailSidebar so a
+   * v2-flagged tenant doesn't lose access to its identity surface.
+   * Operator feedback 2026-05-25 was that v2 dropped the user info
+   * entirely and there was no way to find "who am I signed in as".
+   */
+  user?: { email: string; role: string };
+  /** Click handler for the user chip (typically opens theme/sign-out menu). */
+  onUserSettingsClick?: () => void;
+
   /** Word-mark / logo slot. Replaces the default text "tensorcost" lockup. */
   logoSlot?: ReactNode;
   /** Build/version tag shown under the word-mark. Default omitted. */
@@ -75,6 +86,8 @@ export function RailV2({
   environment,
   onTenantClick,
   onEnvClick,
+  user,
+  onUserSettingsClick,
   logoSlot,
   versionLabel,
   width = 240,
@@ -219,6 +232,95 @@ export function RailV2({
           );
         })}
       </ul>
+
+      {/* User chip — pinned above the tenant strip when a user prop is
+          supplied. Renders the signed-in email + role and a settings
+          affordance (gear glyph) on the right. Single-line truncation
+          on the email so a long address doesn't push the gear out of
+          view. */}
+      {user && (
+        <button
+          type="button"
+          onClick={onUserSettingsClick}
+          aria-label={`User settings — ${user.email}`}
+          style={{
+            all: "unset",
+            display: "flex",
+            alignItems: "center",
+            gap: 10,
+            padding: "10px 20px",
+            borderTopWidth: 1,
+            borderTopStyle: "solid",
+            borderTopColor: p.paper3,
+            background: p.paper,
+            color: p.ink,
+            cursor: onUserSettingsClick ? "pointer" : "default",
+            width: "100%",
+            boxSizing: "border-box",
+          }}
+        >
+          {/* Avatar — single-letter mark from the email. */}
+          <span
+            aria-hidden
+            style={{
+              width: 24,
+              height: 24,
+              flexShrink: 0,
+              background: p.ink,
+              color: p.paper,
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontFamily: BLUEPRINT_FAMILIES.mono,
+              fontSize: 11,
+              fontWeight: 600,
+            }}
+          >
+            {(user.email[0] ?? "?").toUpperCase()}
+          </span>
+          <span style={{ flex: 1, minWidth: 0 }}>
+            <span
+              style={{
+                fontFamily: BLUEPRINT_FAMILIES.body,
+                fontSize: 12,
+                fontWeight: 500,
+                color: p.ink,
+                display: "block",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {user.email}
+            </span>
+            <span
+              style={{
+                fontFamily: BLUEPRINT_FAMILIES.mono,
+                fontSize: 9,
+                color: p.ink3,
+                letterSpacing: "0.12em",
+                textTransform: "uppercase",
+                display: "block",
+              }}
+            >
+              {user.role}
+            </span>
+          </span>
+          {onUserSettingsClick && (
+            <span
+              aria-hidden
+              style={{
+                fontFamily: BLUEPRINT_FAMILIES.mono,
+                fontSize: 14,
+                color: p.ink3,
+                flexShrink: 0,
+              }}
+            >
+              ⚙
+            </span>
+          )}
+        </button>
+      )}
 
       {/* Tenant + env strip — pinned bottom. Two separately-clickable
           buttons when both handlers are supplied (multi-tenant case);
