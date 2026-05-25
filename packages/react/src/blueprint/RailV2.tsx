@@ -171,8 +171,18 @@ export function RailV2({
                   gap: 4,
                   width: "100%",
                   padding: "12px 20px",
-                  background: isActive ? p.ink : "transparent",
-                  color: isActive ? p.paper : p.ink,
+                  // Active row = elevated paper layer + accent left edge.
+                  // Earlier this was bg=p.ink / text=p.paper — the iconic
+                  // "ink block" treatment. In LIGHT that read fine; in
+                  // DARK mode `p.ink` is cream-white (#ece9e0) so the
+                  // active row went near-white against the graphite
+                  // sidebar, which operator feedback 2026-05-25 flagged
+                  // as wrong ("left nav has white background for selected
+                  // menu item"). paper3 gives subtle elevation in both
+                  // modes — tan ruled-grid step in light, elevated
+                  // graphite in dark — without flipping foreground.
+                  background: isActive ? p.paper3 : "transparent",
+                  color: p.ink,
                   // Reset user-agent button borders via longhand widths;
                   // active left-border colored, all other sides transparent.
                   // Width stays 3 on left when inactive so the layout
@@ -194,7 +204,10 @@ export function RailV2({
                     fontFamily: BLUEPRINT_FAMILIES.mono,
                     fontSize: 10,
                     fontWeight: 600,
-                    color: isActive ? p.paper : p.faint,
+                    // Numeric prefix tracks the row's emphasis — accent
+                    // (rail-active orange) when active so the index
+                    // reads as part of the highlight; faint when not.
+                    color: isActive ? p.accent : p.faint,
                     letterSpacing: "0.06em",
                     lineHeight: 1.4,
                   }}

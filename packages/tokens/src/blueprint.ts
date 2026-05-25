@@ -52,10 +52,17 @@ export interface BlueprintPalette {
 }
 
 export const BLUEPRINT_LIGHT: BlueprintPalette = {
-  paper: "#fbfaf6",
-  paper2: "#f3f1ea",
-  paper3: "#e7e4d8",
-  faint: "#a8a59a",
+  // Paper steps warmed up 2026-05-25 — operator feedback that the
+  // original near-white #fbfaf6 read as "too much white", not the
+  // vellum-on-architectural-drawing tone the design calls for.
+  // New values land closer to actual blueprint paper: a tinted
+  // off-white with visible warm bias, and the elevation steps are
+  // perceivably warmer too so a card on paper2/paper3 reads as a
+  // distinct layer instead of a near-identical sheet.
+  paper: "#f4eedc",
+  paper2: "#ece6d0",
+  paper3: "#ddd6bd",
+  faint: "#a89e83",
 
   ink: "#0a0a0a",
   ink2: "#3a3a36",
@@ -63,7 +70,7 @@ export const BLUEPRINT_LIGHT: BlueprintPalette = {
   ink4: "#16161a",
 
   accent: "#FF4814",
-  accentBg: "#fff1eb",
+  accentBg: "#ffe8dc",
 
   good: "#0a7a2f",
   warn: "#a05c00",
