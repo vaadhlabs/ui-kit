@@ -65,3 +65,15 @@ export type { DimProps } from "./Dim.js";
 // existing kit's `SectionHeader` (Workshop's page-header component).
 export { SectionDivider } from "./SectionDivider.js";
 export type { SectionDividerProps } from "./SectionDivider.js";
+
+// Theming — provider + hooks for light/dark palette switching
+export {
+  BlueprintThemeProvider,
+  usePalette,
+  useBlueprintTheme,
+} from "./ThemeProvider.js";
+export type {
+  BlueprintMode,
+  BlueprintThemeContextValue,
+  BlueprintThemeProviderProps,
+} from "./ThemeProvider.js";

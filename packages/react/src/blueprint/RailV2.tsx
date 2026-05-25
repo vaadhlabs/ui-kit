@@ -11,7 +11,8 @@
  * for standalone storyboards.
  */
 import type { CSSProperties, ReactNode } from "react";
-import { BLUEPRINT_FAMILIES, BLUEPRINT_LIGHT } from "@tensorcost/tokens";
+import { BLUEPRINT_FAMILIES } from "@tensorcost/tokens";
+import { usePalette } from "./ThemeProvider.js";
 
 export type SurfaceId = "router" | "money" | "policy" | "build" | "trust";
 
@@ -80,7 +81,7 @@ export function RailV2({
   style,
   className,
 }: RailV2Props): JSX.Element {
-  const p = BLUEPRINT_LIGHT;
+  const p = usePalette();
 
   return (
     <nav

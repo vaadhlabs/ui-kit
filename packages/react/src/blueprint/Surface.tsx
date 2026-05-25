@@ -9,7 +9,7 @@
  * The 28px body padding matches the design's spec sheet rhythm.
  */
 import type { CSSProperties, ReactNode } from "react";
-import { BLUEPRINT_LIGHT } from "@tensorcost/tokens";
+import { usePalette } from "./ThemeProvider.js";
 import { Frame } from "./Frame.js";
 import type { FrameProps } from "./Frame.js";
 import { RailV2 } from "./RailV2.js";
@@ -53,7 +53,7 @@ export function Surface({
   style,
   className,
 }: SurfaceProps): JSX.Element {
-  const p = BLUEPRINT_LIGHT;
+  const p = usePalette();
   return (
     <section
       className={className}

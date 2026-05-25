@@ -9,7 +9,8 @@
  * render as a thin mono number next to the label.
  */
 import type { CSSProperties, ReactNode } from "react";
-import { BLUEPRINT_FAMILIES, BLUEPRINT_LIGHT } from "@tensorcost/tokens";
+import { BLUEPRINT_FAMILIES } from "@tensorcost/tokens";
+import { usePalette } from "./ThemeProvider.js";
 
 export interface SubTab {
   /** Stable identifier — used for the active key + the click callback. */
@@ -46,7 +47,7 @@ export function SubTabs({ items, onTabClick, style, className }: SubTabsProps): 
         `Demote one to a workflow card, detail page, or row action.`,
     );
   }
-  const p = BLUEPRINT_LIGHT;
+  const p = usePalette();
   return (
     <div
       role="tablist"

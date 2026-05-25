@@ -8,7 +8,8 @@
  * visual nod to a screen capture, no functional purpose.
  */
 import type { CSSProperties, ReactNode } from "react";
-import { BLUEPRINT_FAMILIES, BLUEPRINT_LIGHT } from "@tensorcost/tokens";
+import { BLUEPRINT_FAMILIES } from "@tensorcost/tokens";
+import { usePalette } from "./ThemeProvider.js";
 
 export interface FrameProps {
   /** Path-style title in the top-bar — "/router · live". */
@@ -34,7 +35,7 @@ export function Frame({
   className,
   children,
 }: FrameProps): JSX.Element {
-  const p = BLUEPRINT_LIGHT;
+  const p = usePalette();
   const outer: CSSProperties = {
     width: w ?? (mobile ? 380 : 1280),
     height: h,

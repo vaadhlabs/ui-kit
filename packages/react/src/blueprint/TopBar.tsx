@@ -6,7 +6,7 @@
  * holds Btn instances on the right.
  */
 import type { CSSProperties, ReactNode } from "react";
-import { BLUEPRINT_LIGHT } from "@tensorcost/tokens";
+import { usePalette } from "./ThemeProvider.js";
 import { Eyebrow, H2 } from "./Text.js";
 
 export interface TopBarProps {
@@ -30,7 +30,7 @@ export function TopBar({
   style,
   className,
 }: TopBarProps): JSX.Element {
-  const p = BLUEPRINT_LIGHT;
+  const p = usePalette();
   const css: CSSProperties = {
     display: "flex",
     alignItems: "flex-end",
