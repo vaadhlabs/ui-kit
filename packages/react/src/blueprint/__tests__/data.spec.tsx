@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 import { render } from "@testing-library/react";
 import {
   Dim,
@@ -126,6 +126,111 @@ describe("Table", () => {
     ];
     const { getByTestId } = render(<Table cols={cols} rows={richRows} />);
     expect(getByTestId("rich")).toBeTruthy();
+  });
+});
+
+// ----------------------------------------------------------------------------
+// Table — resizable mode
+// ----------------------------------------------------------------------------
+
+describe("Table resizable", () => {
+  const cols: TableColumn[] = [
+    { key: "a", label: "Alpha", w: "2fr" },
+    { key: "b", label: "Beta",  w: "1fr" },
+    { key: "c", label: "Gamma", w: "1fr" },
+  ];
+  const rows: TableRow[] = [
+    { a: "row1-a", b: "row1-b", c: "row1-c" },
+  ];
+
+  // jsdom localStorage is ephemeral per test but available.
+  beforeEach(() => localStorage.clear());
+
+  it("renders resize handles on non-last header columns", () => {
+    const { container } = render(
+      <Table cols={cols} rows={rows} resizable="test-table" />,
+    );
+    // First two columns should have a resize handle, the last should not.
+    expect(container.querySelector('[data-testid="col-resize-a"]')).toBeTruthy();
+    expect(container.querySelector('[data-testid="col-resize-b"]')).toBeTruthy();
+    expect(container.querySelector('[data-testid="col-resize-c"]')).toBeNull();
+  });
+
+  it("does NOT render resize handles when resizable prop is absent", () => {
+    const { container } = render(<Table cols={cols} rows={rows} />);
+    expect(container.querySelector('[data-testid^="col-resize-"]')).toBeNull();
+  });
+
+  it("loads persisted widths from localStorage on mount", () => {
+    // Pre-seed localStorage with a known width for column 'a'.
+    localStorage.setItem("tc_col_widths_test-table", JSON.stringify({ a: 200 }));
+
+    const { container } = render(
+      <Table cols={cols} rows={rows} resizable="test-table" />,
+    );
+
+    // The header row's grid-template-columns should include 200px for col 'a'.
+    const headerRow = container.querySelector<HTMLDivElement>('[role="row"]')!;
+    expect(headerRow.style.gridTemplateColumns).toContain("200px");
+  });
+
+  it("persists new width to localStorage after pointer drag", () => {
+    const { container } = render(
+      <Table cols={cols} rows={rows} resizable="persist-test" />,
+    );
+
+    const handle = container.querySelector<HTMLDivElement>('[data-testid="col-resize-a"]')!;
+
+    // Simulate drag: pointerdown at x=100, pointermove to x=180 (+80px).
+    // jsdom doesn't implement offsetWidth so startWidth defaults to 120 in
+    // the component (the fallback when offsetWidth is 0 and no stored value).
+    // After dragging +80px, the new width = 120 + 80 = 200px.
+    handle.dispatchEvent(
+      new PointerEvent("pointerdown", { clientX: 100, bubbles: true }),
+    );
+    handle.dispatchEvent(
+      new PointerEvent("pointermove", { clientX: 180, bubbles: true }),
+    );
+    handle.dispatchEvent(
+      new PointerEvent("pointerup", { bubbles: true }),
+    );
+
+    const stored = JSON.parse(localStorage.getItem("tc_col_widths_persist-test") ?? "{}") as Record<string, number>;
+    // The stored value should be a number (exact value depends on jsdom's
+    // offsetWidth which is 0 in jsdom, so startWidth = 120, result = 200).
+    expect(typeof stored["a"]).toBe("number");
+  });
+
+  it("enforces minimum column width of 48px on drag", () => {
+    // Seed an existing 100px width so startWidth is deterministic.
+    localStorage.setItem("tc_col_widths_min-test", JSON.stringify({ a: 100 }));
+
+    const { container } = render(
+      <Table cols={cols} rows={rows} resizable="min-test" />,
+    );
+
+    const handle = container.querySelector<HTMLDivElement>('[data-testid="col-resize-a"]')!;
+
+    // Drag far to the left: start at x=200, move to x=0 (–200px).
+    // 100 + (0 - 200) = -100 → clamped to 48.
+    handle.dispatchEvent(new PointerEvent("pointerdown", { clientX: 200, bubbles: true }));
+    handle.dispatchEvent(new PointerEvent("pointermove", { clientX: 0, bubbles: true }));
+    handle.dispatchEvent(new PointerEvent("pointerup", { bubbles: true }));
+
+    const stored = JSON.parse(localStorage.getItem("tc_col_widths_min-test") ?? "{}") as Record<string, number>;
+    expect(stored["a"]).toBe(48);
+  });
+
+  it("different storageKey values don't share state", () => {
+    localStorage.setItem("tc_col_widths_table-A", JSON.stringify({ a: 300 }));
+
+    const { container } = render(
+      <Table cols={cols} rows={rows} resizable="table-B" />,
+    );
+
+    const headerRow = container.querySelector<HTMLDivElement>('[role="row"]')!;
+    // table-B has no stored widths, so it should NOT contain "300px".
+    expect(headerRow.style.gridTemplateColumns).not.toContain("300px");
   });
 });
 
