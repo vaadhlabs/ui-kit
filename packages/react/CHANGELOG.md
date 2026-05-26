@@ -1,8 +1,8 @@
 # Changelog — @tensorcost/ui-kit
 
-## 1.0.0-alpha.7
+## 1.0.0-alpha.8
 
-- Table: `ResizableTable` subcomponent with pointer-capture drag handles, `localStorage` persistence at `tc_col_widths_<key>`, 48px `MIN_COL_PX` clamp; `Table` forwards new `resizable?: string` prop to it.
+- Table: `ResizableTable` subcomponent with pointer-capture drag handles, `localStorage` persistence at `tc_col_widths_<key>`, 48px `MIN_COL_PX` clamp; `Table` forwards new `resizable?: string` prop to it. (1.0.0-alpha.7 unpublished due to unresolved `workspace:*` dep on `@tensorcost/tokens`.)
 
 ## 0.2.0
 
