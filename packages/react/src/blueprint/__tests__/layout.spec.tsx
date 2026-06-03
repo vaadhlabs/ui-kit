@@ -70,12 +70,14 @@ describe("RailV2", () => {
     expect(container.textContent).toContain("Trust");
   });
 
-  it("active surface gets aria-current=page + ink fill + accent left-border", () => {
+  it("active surface gets aria-current=page + paper3 fill + accent left-border", () => {
     const { container } = render(<RailV2 active="policy" />);
     const buttons = container.querySelectorAll<HTMLButtonElement>('li button');
     const policy = buttons[2]!;  // 3rd = policy
     expect(policy.getAttribute("aria-current")).toBe("page");
-    expect(policy.style.background).toBe(rgb(BLUEPRINT_LIGHT.ink));
+    // Redesign 2026-06: active fill softened from solid ink to paper3 —
+    // the gradient left bar (borderImage) carries the active accent.
+    expect(policy.style.background).toBe(rgb(BLUEPRINT_LIGHT.paper3));
     // Per-side longhand widths + single borderColor; active = accent.
     expect(policy.style.borderLeftWidth).toBe("3px");
     expect(policy.style.borderTopWidth).toBe("0px");

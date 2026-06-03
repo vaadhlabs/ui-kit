@@ -43,7 +43,8 @@ describe("blueprint palette", () => {
   });
 
   it("uses warm vellum as the light paper, near-black ink", () => {
-    expect(BLUEPRINT_LIGHT.paper).toBe("#fbfaf6");
+    // Paper warmed 2026-05-25 (see blueprint.ts) — vellum tint, not near-white.
+    expect(BLUEPRINT_LIGHT.paper).toBe("#f4eedc");
     expect(BLUEPRINT_LIGHT.ink).toBe("#0a0a0a");
   });
 });
@@ -86,8 +87,8 @@ describe("blueprint stroke", () => {
   it("derives hairline against the given palette", () => {
     const s = strokeFor(BLUEPRINT_LIGHT);
     expect(s.hairline).toBe("1px solid #0a0a0a");
-    expect(s.hairlineSoft).toBe("1px solid #e7e4d8");
-    expect(s.ghost).toBe("1px dashed #a8a59a");
+    expect(s.hairlineSoft).toBe(`1px solid ${BLUEPRINT_LIGHT.paper3}`);
+    expect(s.ghost).toBe(`1px dashed ${BLUEPRINT_LIGHT.faint}`);
   });
 });
 

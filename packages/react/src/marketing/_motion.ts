@@ -22,6 +22,13 @@ export function useScrollProgress(duration = 1500): [RefObject<HTMLDivElement>, 
   useEffect(() => {
     const el = ref.current;
     if (!el) return undefined;
+    // Reduced motion: skip both the scroll gate and the tween — show the
+    // final state immediately. (Also makes jsdom tests deterministic, where
+    // getBoundingClientRect is all zeros and the gate would never open.)
+    if (prefersReduced()) {
+      setP(1);
+      return undefined;
+    }
     let raf = 0;
     let t0 = 0;
     let done = false;

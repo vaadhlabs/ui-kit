@@ -145,7 +145,11 @@ function ResizableTable({
   const onPointerDown = useCallback(
     (e: React.PointerEvent<HTMLDivElement>, colKey: string, colIdx: number) => {
       e.preventDefault();
-      (e.currentTarget as HTMLDivElement).setPointerCapture(e.pointerId);
+      // jsdom (tests) doesn't implement pointer capture — guard the call.
+      const target = e.currentTarget as HTMLDivElement;
+      if (typeof target.setPointerCapture === "function") {
+        target.setPointerCapture(e.pointerId);
+      }
       const cell = headerCellRefs.current[colIdx];
       const startWidth =
         colWidths[colKey] ??

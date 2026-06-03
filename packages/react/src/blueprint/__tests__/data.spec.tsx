@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import { render } from "@testing-library/react";
+import { fireEvent, render } from "@testing-library/react";
 import {
   Dim,
   LeaderCallout,
@@ -185,15 +185,12 @@ describe("Table resizable", () => {
     // jsdom doesn't implement offsetWidth so startWidth defaults to 120 in
     // the component (the fallback when offsetWidth is 0 and no stored value).
     // After dragging +80px, the new width = 120 + 80 = 200px.
-    handle.dispatchEvent(
-      new PointerEvent("pointerdown", { clientX: 100, bubbles: true }),
-    );
-    handle.dispatchEvent(
-      new PointerEvent("pointermove", { clientX: 180, bubbles: true }),
-    );
-    handle.dispatchEvent(
-      new PointerEvent("pointerup", { bubbles: true }),
-    );
+    // fireEvent wraps each dispatch in act() — required because pointermove
+    // is a continuous event React batches asynchronously; raw dispatchEvent
+    // would let the test read localStorage before the state/effect flush.
+    fireEvent.pointerDown(handle, { clientX: 100 });
+    fireEvent.pointerMove(handle, { clientX: 180 });
+    fireEvent.pointerUp(handle);
 
     const stored = JSON.parse(localStorage.getItem("tc_col_widths_persist-test") ?? "{}") as Record<string, number>;
     // The stored value should be a number (exact value depends on jsdom's
@@ -213,9 +210,9 @@ describe("Table resizable", () => {
 
     // Drag far to the left: start at x=200, move to x=0 (–200px).
     // 100 + (0 - 200) = -100 → clamped to 48.
-    handle.dispatchEvent(new PointerEvent("pointerdown", { clientX: 200, bubbles: true }));
-    handle.dispatchEvent(new PointerEvent("pointermove", { clientX: 0, bubbles: true }));
-    handle.dispatchEvent(new PointerEvent("pointerup", { bubbles: true }));
+    fireEvent.pointerDown(handle, { clientX: 200 });
+    fireEvent.pointerMove(handle, { clientX: 0 });
+    fireEvent.pointerUp(handle);
 
     const stored = JSON.parse(localStorage.getItem("tc_col_widths_min-test") ?? "{}") as Record<string, number>;
     expect(stored["a"]).toBe(48);
