@@ -16,6 +16,23 @@ import { usePalette } from "./ThemeProvider.js";
 
 export type SurfaceId = "router" | "money" | "policy" | "build" | "trust";
 
+/** Subtle per-surface line icon, stacked above the index in the rail.
+ *  Strokes inherit `currentColor` so the rail controls active/idle colour. */
+function surfaceIcon(id: SurfaceId): ReactNode {
+  const paths: Record<SurfaceId, ReactNode> = {
+    router: <><circle cx="5" cy="12" r="2" /><circle cx="19" cy="6" r="2" /><circle cx="19" cy="18" r="2" /><path d="M7 12 17 6.5M7 12l10 5.5" /></>,
+    money: <><rect x="3" y="6" width="18" height="12" rx="2" /><circle cx="12" cy="12" r="2.5" /></>,
+    policy: <path d="M12 3l7 3v5c0 4.2-2.9 7.4-7 9-4.1-1.6-7-4.8-7-9V6z" />,
+    build: <><rect x="3" y="4" width="18" height="16" rx="2" /><path d="M7 9l3 3-3 3M13 15h4" /></>,
+    trust: <><rect x="5" y="11" width="14" height="9" rx="2" /><path d="M8 11V8a4 4 0 0 1 8 0v3" /></>,
+  };
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      {paths[id]}
+    </svg>
+  );
+}
+
 export interface RailItem {
   id: SurfaceId;
   /** "01" .. "05" — the architectural-drawing index. */
@@ -104,19 +121,19 @@ export function RailV2({
         width,
         minWidth: width,
         background: p.paper,
-        borderRight: `1px solid ${p.ink}`,
+        borderRight: `1px solid ${p.paper3}`,
         display: "flex",
         flexDirection: "column",
         ...style,
       }}
     >
       {/* Word-mark */}
-      <div style={{ padding: "16px 20px", borderBottom: `1px solid ${p.ink}` }}>
+      <div style={{ padding: "16px 20px", borderBottom: `1px solid ${p.paper3}` }}>
         {logoSlot ?? (
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <span
               aria-hidden
-              style={{ width: 14, height: 14, background: p.accent, display: "inline-block" }}
+              style={{ width: 14, height: 14, background: "linear-gradient(135deg, #3b82f6, #06b6d4)", display: "inline-block" }}
             />
             <span
               style={{
@@ -193,26 +210,36 @@ export function RailV2({
                   borderLeftWidth: 3,
                   borderStyle: "solid",
                   borderColor: isActive ? p.accent : "transparent",
+                  // Active left-edge marker sweeps the brand blue→cyan gradient
+                  // (matches the marketing site). Falls back to the solid accent
+                  // colour above on the rare engine without border-image.
+                  ...(isActive
+                    ? { borderImage: "linear-gradient(180deg, #3b82f6, #06b6d4) 1" }
+                    : {}),
                   borderRadius: 0,
                   cursor: "pointer",
                   textAlign: "left",
                   font: "inherit",
                 }}
               >
-                <span
-                  style={{
-                    fontFamily: BLUEPRINT_FAMILIES.mono,
-                    fontSize: 10,
-                    fontWeight: 600,
-                    // Numeric prefix tracks the row's emphasis — accent
-                    // (rail-active orange) when active so the index
-                    // reads as part of the highlight; faint when not.
-                    color: isActive ? p.accent : p.faint,
-                    letterSpacing: "0.06em",
-                    lineHeight: 1.4,
-                  }}
-                >
-                  {it.n}
+                <span style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 6 }}>
+                  <span aria-hidden style={{ color: isActive ? p.accent : p.ink3, display: "flex" }}>
+                    {surfaceIcon(it.id)}
+                  </span>
+                  <span
+                    style={{
+                      fontFamily: BLUEPRINT_FAMILIES.mono,
+                      fontSize: 10,
+                      fontWeight: 600,
+                      // Index colour tracks the row's emphasis — brand accent
+                      // when active so it reads as part of the highlight.
+                      color: isActive ? p.accent : p.faint,
+                      letterSpacing: "0.06em",
+                      lineHeight: 1.4,
+                    }}
+                  >
+                    {it.n}
+                  </span>
                 </span>
                 <span>
                   <span
@@ -344,7 +371,7 @@ export function RailV2({
             padding: "12px 20px",
             borderTopWidth: 1,
             borderTopStyle: "solid",
-            borderTopColor: p.ink,
+            borderTopColor: p.paper3,
             background: p.paper2,
             color: p.ink,
           }}

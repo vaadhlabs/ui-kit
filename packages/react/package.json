@@ -1,6 +1,9 @@
 {
   "name": "@tensorcost/ui-kit",
-  "version": "1.0.0-alpha.8",
+  "version": "1.0.0",
+  "files": [
+    "dist"
+  ],
   "license": "Apache-2.0",
   "type": "module",
   "main": "./dist/index.js",
@@ -31,7 +34,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "description": "TensorCost design system — React components, MUI 7 theme, semantic tone palette, charts. The canonical UI kit for TensorCost apps, the marketing site, and slide pipelines.",
+  "description": "TensorCost design system \u2014 React components, MUI 7 theme, semantic tone palette, charts. The canonical UI kit for TensorCost apps, the marketing site, and slide pipelines.",
   "keywords": [
     "tensorcost",
     "design-system",

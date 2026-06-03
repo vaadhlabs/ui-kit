@@ -62,6 +62,7 @@ const Box = forwardRef<HTMLDivElement, BoxProps>(function Box(
         height: h,
         padding: p,
         boxSizing: "border-box",
+        borderRadius: 12,
         ...style,
       }}
       {...rest}

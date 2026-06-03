@@ -234,13 +234,24 @@ export function Mono({
 export interface NumProps extends CommonProps {
   size?: SizeProp;
   weight?: number;
+  /**
+   * Render the number in the brand blue→cyan gradient (the marketing-site
+   * signature). Opt-in — use ONLY on positive "hero" figures (routing savings,
+   * verified savings, ROI), never on neutral counts or red over-budget numbers.
+   * Ignored when an explicit `color` is passed.
+   */
+  gradient?: boolean;
 }
+
+/** Marketing brand sweep — kept in sync with the website's hero numbers. */
+const BRAND_GRADIENT = "linear-gradient(135deg, #3b82f6, #06b6d4)";
 
 export function Num({
   children,
   color,
   size,
   weight = 500,
+  gradient = false,
   style,
   className,
 }: NumProps): JSX.Element {
@@ -248,6 +259,17 @@ export function Num({
   // ink reads thinner at hero scale (88px+) than the same metric in light;
   // 600 brings perceived weight back into line. Light keeps 500 (unchanged).
   const p = usePalette();
+  const gradientSx = gradient && color == null
+    ? {
+        background: BRAND_GRADIENT,
+        WebkitBackgroundClip: "text" as const,
+        backgroundClip: "text" as const,
+        WebkitTextFillColor: "transparent" as const,
+        color: "transparent",
+        // Soft brand glow behind the hero figure — the marketing-site signature.
+        filter: "drop-shadow(0 0 26px rgba(59,130,246,0.28))",
+      }
+    : { color: color ?? p.ink };
   return (
     <span
       className={className}
@@ -258,7 +280,7 @@ export function Num({
         lineHeight: BLUEPRINT_TYPE.num.lineHeight,
         letterSpacing: BLUEPRINT_TYPE.num.letterSpacing,
         fontVariantNumeric: "tabular-nums",
-        color: color ?? p.ink,
+        ...gradientSx,
         ...style,
       }}
     >

@@ -66,6 +66,7 @@ export function Tag({
     color: t.color,
     border: `1px solid ${t.bd}`,
     background: t.bg,
+    borderRadius: 5,
     ...style,
   };
   return (

@@ -61,6 +61,12 @@ export type { LeaderCalloutProps } from "./LeaderCallout.js";
 export { Dim } from "./Dim.js";
 export type { DimProps } from "./Dim.js";
 
+export { Ring } from "./Ring.js";
+export type { RingProps } from "./Ring.js";
+
+export { Sparkline } from "./Sparkline.js";
+export type { SparklineProps } from "./Sparkline.js";
+
 // Renamed from the design's `SectionHeader` to avoid colliding with the
 // existing kit's `SectionHeader` (Workshop's page-header component).
 export { SectionDivider } from "./SectionDivider.js";

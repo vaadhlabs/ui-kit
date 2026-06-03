@@ -15,8 +15,20 @@ export * from "./MarkdownBody.js";
 export * from "./MarketingContentBlock.js";
 export * from "./TabsSection.js";
 
+// Forms
+export * from "./Form.js";
+
+// Pricing
+export * from "./PricingTable.js";
+
+// Animated data-viz (Phase 5)
+export * from "./MarketingCharts.js";
+export * from "./ROICalculator.js";
+
 // Top-of-page conversion
 export * from "./MarketingHero.js";
+export * from "./SplitHero.js";
+export * from "./DashboardMock.js";
 export * from "./MarketingCTABanner.js";
 
 // Social proof tier
@@ -26,6 +38,7 @@ export * from "./Timeline.js";
 export * from "./ProofSection.js";
 
 // Display / data
+export * from "./ProductScreenshot.js";
 export * from "./FeatureGrid.js";
 export * from "./LogosStrip.js";
 export * from "./StatsCounter.js";

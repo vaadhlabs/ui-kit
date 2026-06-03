@@ -1,5 +1,33 @@
 import { type ReactElement } from "react";
 import { Box, Stack, Typography } from "@mui/material";
+import { useScrollProgress } from "./_motion.js";
+import { useSurfaces } from "./_surfaces.js";
+
+/**
+ * Animated stat value — counts up from 0 when the value is purely numeric
+ * (optionally $-prefixed, comma-grouped). Non-numeric values like "75/25" or
+ * "2 wks" render statically.
+ */
+function StatValue({ value, suffix, isDark }: { value: string | number; suffix?: string; isDark: boolean }): ReactElement {
+  const [ref, p] = useScrollProgress(1400);
+  const str = String(value);
+  const m = str.match(/^(\$?)([\d,]+)$/);
+  let display = str;
+  if (m) {
+    const num = parseInt((m[2] ?? "0").replace(/,/g, ""), 10);
+    display = (m[1] ?? "") + Math.round(num * p).toLocaleString("en-US");
+  }
+  return (
+    <Typography
+      ref={ref}
+      component="div"
+      sx={{ fontSize: "clamp(2rem, 4vw, 3rem)", fontWeight: 700, lineHeight: 1, letterSpacing: "-0.02em", color: isDark ? "#fff" : "primary.main" }}
+    >
+      {display}
+      {suffix && <Box component="span" sx={{ fontSize: "60%", opacity: 0.7, ml: "0.15em" }}>{suffix}</Box>}
+    </Typography>
+  );
+}
 
 // ---------------------------------------------------------------------------
 // Types
@@ -42,7 +70,9 @@ export function StatsStrip({
   variant = "light",
   className,
 }: StatsStripProps): ReactElement {
-  const isDark = variant === "dark";
+  const sf = useSurfaces();
+  // Explicit dark variant is always dark; the light variant follows the theme.
+  const isDark = variant === "dark" || sf.dark;
 
   return (
     <Box
@@ -92,30 +122,7 @@ export function StatsStrip({
       >
         {stats.map((stat, i) => (
           <Box key={i} sx={{ textAlign: "center" }}>
-            <Typography
-              component="div"
-              sx={{
-                fontSize: "clamp(2rem, 4vw, 3rem)",
-                fontWeight: 700,
-                lineHeight: 1,
-                letterSpacing: "-0.02em",
-                color: isDark ? "#fff" : "primary.main",
-              }}
-            >
-              {stat.value}
-              {stat.suffix && (
-                <Box
-                  component="span"
-                  sx={{
-                    fontSize: "60%",
-                    opacity: 0.7,
-                    ml: "0.15em",
-                  }}
-                >
-                  {stat.suffix}
-                </Box>
-              )}
-            </Typography>
+            <StatValue value={stat.value} suffix={stat.suffix} isDark={isDark} />
 
             <Typography
               component="div"

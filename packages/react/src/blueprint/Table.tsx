@@ -182,8 +182,9 @@ function ResizableTable({
         flexDirection: "column",
         borderWidth: 1,
         borderStyle: "solid",
-        borderColor: p.ink,
-        overflowX: "auto",
+        borderColor: p.paper3,
+        borderRadius: 12,
+        overflow: "hidden",
         ...style,
       }}
     >
@@ -195,7 +196,7 @@ function ResizableTable({
           gridTemplateColumns: tracks,
           borderBottomWidth: 1,
           borderBottomStyle: "solid",
-          borderBottomColor: p.ink,
+          borderBottomColor: p.paper3,
           background: p.paper2,
         }}
       >

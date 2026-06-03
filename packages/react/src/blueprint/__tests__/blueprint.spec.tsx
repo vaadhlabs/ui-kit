@@ -277,12 +277,12 @@ describe("Btn", () => {
 // ----------------------------------------------------------------------------
 
 describe("Callout", () => {
-  it("renders a circular orange chip with the number", () => {
+  it("renders a circular brand-gradient chip with the number", () => {
     const { container } = render(<Callout n={2} />);
     const el = container.querySelector("span")!;
     expect(el.textContent).toBe("2");
     expect(el.style.borderRadius).toBe("50%");
-    expect(el.style.background).toBe(rgb(BLUEPRINT_LIGHT.accent));
+    expect(el.style.background).toContain("linear-gradient");
   });
 
   it("size prop scales font proportionally", () => {

@@ -61,6 +61,7 @@ const Btn = forwardRef<HTMLButtonElement, BtnProps>(function Btn(
     background: t.bg,
     color: t.fg,
     border: `1px solid ${t.bd}`,
+    borderRadius: 8,
     cursor: rest.disabled ? "not-allowed" : "pointer",
     opacity: rest.disabled ? 0.55 : 1,
     ...sz,

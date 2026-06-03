@@ -14,6 +14,7 @@
 import { type ReactElement } from "react";
 import { Box, Typography } from "@mui/material";
 import { MarkdownBody } from "./MarkdownBody.js";
+import { useSurfaces } from "./_surfaces.js";
 
 type MaxWidthKey = "small" | "medium" | "large" | "full";
 type PaddingKey = "none" | "small" | "medium" | "large";
@@ -60,13 +61,14 @@ export function MarketingContentBlock({
   eyebrow,
   content,
   body,
-  backgroundColor = "#ffffff",
-  textColor = "#333333",
+  backgroundColor,
+  textColor,
   maxWidth = "medium",
   padding = "medium",
   alignment = "left",
   className,
 }: MarketingContentBlockProps): ReactElement {
+  const s = useSurfaces();
   const resolvedTitle = title || heading;
   const resolvedContent = content || body || "";
 
@@ -75,8 +77,8 @@ export function MarketingContentBlock({
       component="section"
       className={className}
       sx={{
-        background: backgroundColor,
-        color: textColor,
+        background: backgroundColor || s.page,
+        color: textColor || s.ink,
         py: PADDING_MAP[padding],
         px: "2rem",
       }}
