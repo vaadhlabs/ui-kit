@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, develop]
   pull_request:
 
 jobs:
@@ -17,8 +17,6 @@ jobs:
           node-version: '20'
 
       - uses: pnpm/action-setup@v4
-        with:
-          version: 9
 
       - name: Get pnpm store directory
         id: pnpm-cache
@@ -54,8 +52,6 @@ jobs:
         with:
           node-version: '20'
       - uses: pnpm/action-setup@v4
-        with:
-          version: 9
       - name: Restore node_modules
         uses: actions/cache@v4
         with:
@@ -79,8 +75,6 @@ jobs:
         with:
           node-version: '20'
       - uses: pnpm/action-setup@v4
-        with:
-          version: 9
       - name: Restore node_modules
         uses: actions/cache@v4
         with:
@@ -104,8 +98,6 @@ jobs:
         with:
           node-version: '20'
       - uses: pnpm/action-setup@v4
-        with:
-          version: 9
       - name: Restore node_modules
         uses: actions/cache@v4
         with:
@@ -129,8 +121,6 @@ jobs:
         with:
           node-version: '20'
       - uses: pnpm/action-setup@v4
-        with:
-          version: 9
       - name: Restore node_modules
         uses: actions/cache@v4
         with:
