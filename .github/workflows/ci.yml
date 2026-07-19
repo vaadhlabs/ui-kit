@@ -62,6 +62,9 @@ jobs:
           key: ${{ runner.os }}-node-modules-${{ hashFiles('**/pnpm-lock.yaml') }}
       - name: Install (fallback if cache miss)
         run: pnpm install --frozen-lockfile
+      - name: Build packages
+        run: pnpm build
+
       - name: Typecheck all packages
         run: pnpm typecheck
 
@@ -85,6 +88,9 @@ jobs:
           key: ${{ runner.os }}-node-modules-${{ hashFiles('**/pnpm-lock.yaml') }}
       - name: Install (fallback if cache miss)
         run: pnpm install --frozen-lockfile
+      - name: Build packages
+        run: pnpm build
+
       - name: Test all packages
         run: pnpm test
 
