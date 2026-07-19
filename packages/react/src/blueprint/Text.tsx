@@ -10,8 +10,17 @@
  * passed through (rem/em/clamp/etc). The defaults match the design's
  * default ramps; pages ramp up explicitly (the thesis page uses H1 at
  * 88px instead of the default 56).
+ *
+ * Prop forwarding: every primitive here extends the matching element's
+ * HTMLAttributes and spreads `...rest` onto its rendered node, exactly
+ * like Box/Btn/Tag already do. Found 2026-07-19: they used to declare a
+ * closed `CommonProps` (children/color/style/className only) with no
+ * `...rest`, so a `data-testid`, `aria-*`, `onClick`, `id`, etc. placed on
+ * any of these was silently dropped — no warning, no type error. See
+ * TeamScorecardPage.tsx / CfoPage.tsx in the shell for the workarounds
+ * (wrapper divs, dead data-testid attrs) this bug forced.
  */
-import type { CSSProperties, ReactNode } from "react";
+import type { HTMLAttributes, ReactNode } from "react";
 import {
   BLUEPRINT_FAMILIES,
   BLUEPRINT_LIGHT,
@@ -27,8 +36,6 @@ const px = (s: SizeProp): string => (typeof s === "number" ? `${s}px` : s);
 interface CommonProps {
   children?: ReactNode;
   color?: string;
-  style?: CSSProperties;
-  className?: string;
 }
 
 // ----------------------------------------------------------------------------
@@ -37,7 +44,9 @@ interface CommonProps {
 // discoverability; `Eye` kept as an alias.
 // ----------------------------------------------------------------------------
 
-export interface EyebrowProps extends CommonProps {
+export interface EyebrowProps
+  extends CommonProps,
+    Omit<HTMLAttributes<HTMLSpanElement>, "color"> {
   /** Override the default 10px size when the eyebrow needs to read smaller. */
   size?: SizeProp;
 }
@@ -48,6 +57,7 @@ export function Eyebrow({
   size,
   style,
   className,
+  ...rest
 }: EyebrowProps): JSX.Element {
   const e = BLUEPRINT_TYPE.eyebrow;
   // Default to the active palette's ink3 (label-weight). The previous
@@ -67,6 +77,7 @@ export function Eyebrow({
         color: color ?? p.ink3,
         ...style,
       }}
+      {...rest}
     >
       {children}
     </span>
@@ -80,7 +91,9 @@ export const Eye = Eyebrow;
 // Headings — Inter Tight, weight 500, negative tracking, semantic h1/h2/h3.
 // ----------------------------------------------------------------------------
 
-export interface HeadingProps extends CommonProps {
+export interface HeadingProps
+  extends CommonProps,
+    Omit<HTMLAttributes<HTMLHeadingElement>, "color"> {
   size?: SizeProp;
   weight?: number;
 }
@@ -98,6 +111,7 @@ function makeHeading(
     weight = 500,
     style,
     className,
+    ...rest
   }: HeadingProps): JSX.Element {
     const Tag = tag;
     // Default to active palette's display ink so dark mode actually gets
@@ -117,6 +131,7 @@ function makeHeading(
           color: color ?? p.ink,
           ...style,
         }}
+        {...rest}
       >
         {children}
       </Tag>
@@ -153,7 +168,9 @@ export const H3 = makeHeading(
 // exported as `Body` with a `B` alias.
 // ----------------------------------------------------------------------------
 
-export interface BodyProps extends CommonProps {
+export interface BodyProps
+  extends CommonProps,
+    Omit<HTMLAttributes<HTMLDivElement>, "color"> {
   size?: SizeProp;
   weight?: number;
 }
@@ -165,6 +182,7 @@ export function Body({
   weight = 400,
   style,
   className,
+  ...rest
 }: BodyProps): JSX.Element {
   const p = usePalette();
   return (
@@ -178,6 +196,7 @@ export function Body({
         color: color ?? p.ink2,
         ...style,
       }}
+      {...rest}
     >
       {children}
     </div>
@@ -193,7 +212,9 @@ export const B = Body;
 // Numeric features enabled: tabular-nums + ss01 stylistic set.
 // ----------------------------------------------------------------------------
 
-export interface MonoProps extends CommonProps {
+export interface MonoProps
+  extends CommonProps,
+    Omit<HTMLAttributes<HTMLSpanElement>, "color"> {
   size?: SizeProp;
   weight?: number;
 }
@@ -205,6 +226,7 @@ export function Mono({
   weight = 500,
   style,
   className,
+  ...rest
 }: MonoProps): JSX.Element {
   const p = usePalette();
   return (
@@ -219,6 +241,7 @@ export function Mono({
         color: color ?? p.ink2,
         ...style,
       }}
+      {...rest}
     >
       {children}
     </span>
@@ -231,7 +254,9 @@ export function Mono({
 // Live hero ramps to 120.
 // ----------------------------------------------------------------------------
 
-export interface NumProps extends CommonProps {
+export interface NumProps
+  extends CommonProps,
+    Omit<HTMLAttributes<HTMLSpanElement>, "color"> {
   size?: SizeProp;
   weight?: number;
   /**
@@ -254,6 +279,7 @@ export function Num({
   gradient = false,
   style,
   className,
+  ...rest
 }: NumProps): JSX.Element {
   // Bump the dark-mode default weight from 500 to 600 — the cream-on-graphite
   // ink reads thinner at hero scale (88px+) than the same metric in light;
@@ -283,6 +309,7 @@ export function Num({
         ...gradientSx,
         ...style,
       }}
+      {...rest}
     >
       {children}
     </span>

@@ -45,6 +45,13 @@ describe("Eyebrow / Eye", () => {
   it("Eye is an alias for Eyebrow", () => {
     expect(Eye).toBe(Eyebrow);
   });
+
+  it("passes through HTML attrs (data-*, aria-*) — regression for the 2026-07-19 silent-drop bug", () => {
+    const { container } = render(<Eyebrow data-testid="eb" aria-label="kicker">x</Eyebrow>);
+    const el = container.querySelector("span")!;
+    expect(el.getAttribute("data-testid")).toBe("eb");
+    expect(el.getAttribute("aria-label")).toBe("kicker");
+  });
 });
 
 describe("Headings", () => {
@@ -79,6 +86,15 @@ describe("Headings", () => {
     const { container } = render(<H1 size="5.5rem">thesis</H1>);
     expect(container.querySelector("h1")!.style.fontSize).toBe("5.5rem");
   });
+
+  it("passes through HTML attrs on H1/H2/H3 — regression for the 2026-07-19 silent-drop bug", () => {
+    const { container: c1 } = render(<H1 data-testid="h1-hero">x</H1>);
+    expect(c1.querySelector("h1")!.getAttribute("data-testid")).toBe("h1-hero");
+    const { container: c2 } = render(<H2 data-testid="h2-section">x</H2>);
+    expect(c2.querySelector("h2")!.getAttribute("data-testid")).toBe("h2-section");
+    const { container: c3 } = render(<H3 data-testid="h3-card">x</H3>);
+    expect(c3.querySelector("h3")!.getAttribute("data-testid")).toBe("h3-card");
+  });
 });
 
 describe("Body / B", () => {
@@ -92,6 +108,11 @@ describe("Body / B", () => {
   it("B is an alias for Body", () => {
     expect(B).toBe(Body);
   });
+
+  it("passes through HTML attrs — regression for the 2026-07-19 silent-drop bug", () => {
+    const { container } = render(<Body data-testid="body-prose">x</Body>);
+    expect(container.querySelector("div")!.getAttribute("data-testid")).toBe("body-prose");
+  });
 });
 
 describe("Mono", () => {
@@ -102,6 +123,21 @@ describe("Mono", () => {
     // jsdom doesn't reliably expose fontFeatureSettings via the CSSOM
     // typed attrs, but the inline style attr always carries it.
     expect((el.getAttribute("style") ?? "").toLowerCase()).toContain("font-feature-settings");
+  });
+
+  // Regression test for the 2026-07-19 bug: Mono silently dropped
+  // data-testid (and any other unknown prop) with no warning and no type
+  // error, forcing shell pages to wrap it in an extra <div data-testid=...>
+  // just to make it findable in tests (see TeamScorecardPage.tsx).
+  it("passes through data-testid and other HTML attrs onto the rendered span", () => {
+    const { container } = render(
+      <Mono data-testid="team-scorecard-basis" aria-label="basis line" onClick={() => {}}>
+        Day 3 of 7
+      </Mono>,
+    );
+    const el = container.querySelector("span")!;
+    expect(el.getAttribute("data-testid")).toBe("team-scorecard-basis");
+    expect(el.getAttribute("aria-label")).toBe("basis line");
   });
 });
 
@@ -116,6 +152,11 @@ describe("Num", () => {
   it("default size is the hero default", () => {
     const { container } = render(<Num>24.4</Num>);
     expect(container.querySelector("span")!.style.fontSize).toBe("2rem");
+  });
+
+  it("passes through HTML attrs — regression for the 2026-07-19 silent-drop bug", () => {
+    const { container } = render(<Num data-testid="hero-figure">$8,420</Num>);
+    expect(container.querySelector("span")!.getAttribute("data-testid")).toBe("hero-figure");
   });
 });
 
@@ -291,5 +332,10 @@ describe("Callout", () => {
     expect(el.style.width).toBe("32px");
     // 32 * 0.55 = 17.6
     expect(el.style.fontSize).toBe("17.6px");
+  });
+
+  it("passes through HTML attrs — regression for the 2026-07-19 silent-drop bug", () => {
+    const { container } = render(<Callout n={3} data-testid="leader-chip" />);
+    expect(container.querySelector("span")!.getAttribute("data-testid")).toBe("leader-chip");
   });
 });

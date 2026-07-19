@@ -6,22 +6,20 @@
  * Pairs with LeaderCallout (in the W2 data-primitives wave) which
  * supplies the title + body next to the chip.
  */
-import type { CSSProperties } from "react";
+import type { CSSProperties, HTMLAttributes } from "react";
 import { BLUEPRINT_FAMILIES } from "@tensorcost/tokens";
 
 /** Brand sweep — kept in sync with Num's gradient and the rail marker. */
 const BRAND_GRADIENT = "linear-gradient(135deg, #3b82f6, #06b6d4)";
 
-export interface CalloutProps {
+export interface CalloutProps extends Omit<HTMLAttributes<HTMLSpanElement>, "color"> {
   /** The number that goes inside the circle. */
   n: number | string;
   /** Diameter in px. Default 18. */
   size?: number;
-  style?: CSSProperties;
-  className?: string;
 }
 
-export function Callout({ n, size = 18, style, className }: CalloutProps): JSX.Element {
+export function Callout({ n, size = 18, style, className, ...rest }: CalloutProps): JSX.Element {
   const css: CSSProperties = {
     display: "inline-flex",
     alignItems: "center",
@@ -38,7 +36,7 @@ export function Callout({ n, size = 18, style, className }: CalloutProps): JSX.E
     ...style,
   };
   return (
-    <span className={className} style={css}>
+    <span className={className} style={css} {...rest}>
       {n}
     </span>
   );

@@ -1,5 +1,9 @@
 # Changelog — @tensorcost/ui-kit
 
+## 1.1.0
+
+- Fix: `Eyebrow`/`Eye`, `H1`/`H2`/`H3`, `Body`/`B`, `Mono`, `Num`, and `Callout` now spread unknown props (`data-testid`, `aria-*`, `onClick`, `id`, etc.) onto their rendered DOM element, matching the existing `Box`/`Btn`/`Tag` contract. Previously each of these declared a closed prop interface with no `...rest` spread, so a `data-testid` placed directly on any of them was silently dropped — no warning, no type error — forcing consumers to wrap them in an extra `<div data-testid=...>` just to make them findable in tests. `MonoProps`/`NumProps`/etc. now extend the matching element's `HTMLAttributes` instead of a closed `CommonProps`. Non-breaking: every existing call site still works unchanged, this only widens what's accepted.
+
 ## 1.0.0-alpha.8
 
 - Table: `ResizableTable` subcomponent with pointer-capture drag handles, `localStorage` persistence at `tc_col_widths_<key>`, 48px `MIN_COL_PX` clamp; `Table` forwards new `resizable?: string` prop to it. (1.0.0-alpha.7 unpublished due to unresolved `workspace:*` dep on `@tensorcost/tokens`.)
