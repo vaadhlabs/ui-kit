@@ -41,6 +41,13 @@ export interface RailItem {
   name: string;
   /** One-line description shown under the name. */
   sub: string;
+  /**
+   * Optional per-item icon. When set, RailV2 renders this instead of the
+   * built-in `surfaceIcon(id)` fallback. Lets the shell own menu content
+   * (labels, order, AND icons) — including surfaces outside the published
+   * SurfaceId union — without baking product IA into ui-kit.
+   */
+  icon?: ReactNode;
 }
 
 export const DEFAULT_RAIL_ITEMS: readonly RailItem[] = [
@@ -224,7 +231,7 @@ export function RailV2({
               >
                 <span style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 6 }}>
                   <span aria-hidden style={{ color: isActive ? p.accent : p.ink3, display: "flex" }}>
-                    {surfaceIcon(it.id)}
+                    {it.icon ?? surfaceIcon(it.id)}
                   </span>
                   <span
                     style={{

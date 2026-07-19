@@ -101,6 +101,22 @@ describe("RailV2", () => {
     expect(clicks).toEqual(["money"]);
   });
 
+  it("prefers item.icon over the built-in surfaceIcon fallback", () => {
+    const items: RailItem[] = [
+      {
+        id: "router",
+        n: "01",
+        name: "Router",
+        sub: "decisions",
+        icon: <svg data-testid="custom-rail-icon" width="16" height="16" />,
+      },
+    ];
+    const { getByTestId, container } = render(<RailV2 active="router" items={items} />);
+    expect(getByTestId("custom-rail-icon")).toBeTruthy();
+    // Only one nav button; its icon slot should be the custom svg, not an empty fallback.
+    expect(container.querySelectorAll('nav[aria-label="Primary"] li button').length).toBe(1);
+  });
+
   it("tenant + environment render with separate aria-labels when onEnvClick supplied", () => {
     const { getByLabelText } = render(
       <RailV2
